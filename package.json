@@ -1,0 +1,19 @@
+{
+	"name": "cwd",
+	"version": "0.0.0",
+	"description": "A wrapper for Node's \"child_process\" module",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/taitulism/cwd.git"
+	},
+	"author": "Taitu Lizenbaum",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/taitulism/cwd/issues"
+	},
+	"homepage": "https://github.com/taitulism/cwd#readme"
+}
