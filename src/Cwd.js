@@ -47,6 +47,8 @@ Cwd.prototype = {
     },
 
     isSpawnCmdFailed (cmd, err) {
+        if (err === null) return false;
+        
         return err.message.includes(`spawn ${cmd} ENOENT`);
     },
 

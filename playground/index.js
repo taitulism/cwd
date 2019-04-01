@@ -1,4 +1,5 @@
-const cwd = require('../');
+const createCwd = require('../');
+const logException = require('../src/log-exception');
 
 function isGitRepo (dir) {
     const cmd = 'gsit';
@@ -18,15 +19,45 @@ function isGitRepo (dir) {
     });
 };
 
+const cwd = createCwd(__dirname);
+
+async function runCounter () {
+    const x = await cwd.execFile('node', ['a-process.js'])
+
+    const [err, data] = x;
+
+    if (err) {
+        console.log('task');
+        throw err;
+        // throw runCounterError(err);
+    }
+
+    return [err, data];
+}
+
+function runCounterError (err) {
+    return [
+        'runCounter()',
+        err,
+    ]
+}
+
 (async () => {
     try {
-        const isRepo = await isGitRepo(process.cwd());
-        console.log(isRepo);
+        // const isRepo = await isGitRepo(process.cwd());
+        const [err, data] = await runCounter(process.cwd());
+
+        if (err) {
+            console.log('main proc');
+            throw err;
+            // throw runCounterError(err);
+        }
+
+        console.log(data);
     }
     catch (err) {
-        console.error('EXCEPTION:');
-        // console.log('err', err);
-        console.error('  ', err[0]);
-        console.error('  ', err[1]);
+        console.log('EXCEPTION');
+        console.log(err);
+        // logException('Process Failed', err)
     }
 })()

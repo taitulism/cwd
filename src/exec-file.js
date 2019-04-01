@@ -1,5 +1,5 @@
 const { execFile } = require('child_process');
-const logAndDie = require('./log-and-die');
+const logAndDie = require('./_log-and-die');
 
 // this === Cwd instance
 module.exports = function execFileWrapper (cmd, userArgs, userOpts, userCallback) {
@@ -11,26 +11,16 @@ module.exports = function execFileWrapper (cmd, userArgs, userOpts, userCallback
 
     return new Promise((resolve, reject) => {
         const childProc = execFile(cmd, args, opts, (err, stdout, stderr) => {
-            if (this.isSpawnCmdFailed(cmd, err)) {
-                console.log(1);
-                return reject([
-                    `Cwd.execFile\n   Command: ${cmd}\n   Arguments: ${args}\n   Directory:${this.dirPath}`,
-                    err
-                ]);
-            }            
-
-            console.log('stderr', stderr);
-            console.log('');
             if (err) {
-                console.log('execFile inner callback error');
+                console.log('execFile callback', stderr);
+                return reject(err);
             }
 
-            callback(stderr, stdout);
-            return resolve({stderr, stdout});
+            callback && typeof callback == 'function' && callback(stderr, stdout);
+            return resolve([null, {stderr, stdout}]);
         })
         .on('error', err => {
-            console.log(2);
-            console.log('childProc throwing...');
+            console.log('childProc on error');
             reject(err);
         });
         
