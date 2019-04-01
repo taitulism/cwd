@@ -46,6 +46,10 @@ Cwd.prototype = {
         return [args, opts, callback];
     },
 
+    isSpawnCmdFailed (cmd, err) {
+        return err.message.includes(`spawn ${cmd} ENOENT`);
+    },
+
     getCmdFailMsg (cmd, args, opts, callback) {
         return `Failed Command:\n  cmd: ${cmd}\n  args: ${args}\n  opts: ${opts}\n  callback: ${typeof callback}\n`;
     },
