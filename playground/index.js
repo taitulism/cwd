@@ -23,7 +23,7 @@ const cwd = createCwd(__dirname);
 
 async function runCounter () {
     const x = await cwd.execFile('node', ['a-process.js'])
-
+console.log('x', x);
     const [err, data] = x;
 
     if (err) {
