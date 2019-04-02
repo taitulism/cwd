@@ -1,4 +1,4 @@
-let count = 10;
+let count = 5;
 
 const ref = setInterval(() => {
     console.log('Count: ', count);
@@ -7,9 +7,9 @@ const ref = setInterval(() => {
         clearInterval(ref);
     }
 
-    if (count === 3) {
+    if (count === 2) {
         process.stderr.write('errrrr')
-        process.exit(1)
+        process.exit(0)
         // throw new Error('333!!!')
     }
 

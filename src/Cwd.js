@@ -46,8 +46,8 @@ Cwd.prototype = {
         return [args, opts, callback];
     },
 
-    isSpawnCmdFailed (cmd, err) {
-        if (err === null) return false;
+    isBadCmd (cmd, err) {
+        if (!err) return false;
 
         return err.message.startsWith(`spawn ${cmd} ENOENT`);
     },
