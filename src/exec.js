@@ -1,15 +1,15 @@
-const { execFile } = require('child_process');
+const { exec } = require('child_process');
 const { existsSync } = require('fs');
 const logAndDie = require('./_log-and-die');
 
 // this === Cwd instance
-module.exports = function execFileWrapper (...args) {
+module.exports = function execWrapper (...args) {
     const [cmd, cmdArgs, opts, callback] = this.resolveArguments(...args);
     
     if (!cmd) throw new Error('Cwd.execFile(): Command cannot be empty.');
-
+    
     return new Promise((resolve, reject) => {
-        execFile(cmd, cmdArgs, opts, (err, stdout, stderr) => {
+        execFile(cmd, args, opts, (err, stdout, stderr) => {
             if (this.isBadCmd(cmd, err)) {
 
                 if (opts.cwd !== this.dirPath) {
@@ -17,7 +17,7 @@ module.exports = function execFileWrapper (...args) {
 
                     if (!exists) {
                         const errMsg = `\n
-                            \r  Cwd.execFile(options.cwd): Directory not found
+                            \r  Cwd.exec(options.cwd): Directory not found
                             \r      dir: ${opts.cwd}
                         `;
 
@@ -26,7 +26,7 @@ module.exports = function execFileWrapper (...args) {
                     }
                 }
 
-                const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
+                const errMsg = getBadCmdLogMsg(cmd, args, opts);
                 const exception = new Error(errMsg);
 
                 return reject(exception);

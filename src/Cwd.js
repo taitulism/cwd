@@ -16,13 +16,27 @@ Cwd.prototype = {
     constructor: Cwd,
     execFile,
 
-    resolveArguments (userArgs, userOpts, userCallback) {
+    resolveArguments (userCmd, userArgs, userOpts, userCallback) {
         let cmd = null,
+            cmdArgs = [],
             args = [],
             opts = null,
             defaultOpts = { cwd: this.dirPath },
             callback = null;
             
+        if (!userCmd) return [null];
+
+        const cleanCmd = userCmd.trim().replace(/\s{2,}/g, ' ');
+
+        if (!cleanCmd) return [null];
+        
+        const cmdParts = cleanCmd.split(' ');
+
+        if (cmdParts.length >= 1) {
+            cmd = cmdParts.shift();
+            cmdArgs = cmdParts;
+        }
+
         if (typeof userCallback === 'function') {
             callback = userCallback;
         }
@@ -46,7 +60,7 @@ Cwd.prototype = {
 
         opts = opts || defaultOpts;
 
-        return [args, opts, callback];
+        return [cmd, cmdArgs.concat(args), opts, callback];
     },
 
     isBadCmd (cmd, err) {
