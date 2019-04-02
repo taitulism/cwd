@@ -22,25 +22,17 @@ function isGitRepo (dir) {
 const cwd = createCwd(__dirname);
 
 async function runCounter () {
-    const x = await cwd.execFile('node', ['a-process.js'])
-console.log('x', x);
-    const [err, data] = x;
+    const [err, data] = await cwd.execFile('node', ['a-process.js'])
 
     if (err) {
         console.log('task');
         throw err;
-        // throw runCounterError(err);
     }
 
     return [err, data];
 }
 
-function runCounterError (err) {
-    return [
-        'runCounter()',
-        err,
-    ]
-}
+
 
 (async () => {
     try {
@@ -50,7 +42,6 @@ function runCounterError (err) {
         if (err) {
             console.log('main proc');
             throw err;
-            // throw runCounterError(err);
         }
 
         console.log(data);
