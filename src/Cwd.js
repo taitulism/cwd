@@ -1,6 +1,8 @@
 const { existsSync } = require('fs');
 
 const execFile = require('./exec-file');
+const runCmd = require('./run-cmd');
+const runInShell = require('./run-in-shell');
 
 function Cwd (dirPath) {
     const folderExists = existsSync(dirPath);
@@ -15,6 +17,8 @@ module.exports = Cwd;
 Cwd.prototype = {
     constructor: Cwd,
     execFile,
+    runCmd,
+    runInShell,
 
     resolveArguments (userCmd, userArgs, userOpts, userCallback) {
         let cmd = null,

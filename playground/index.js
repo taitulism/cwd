@@ -12,7 +12,7 @@ async function isGitRepo (dir) {
     const cmd = 'git';
     const cmdArgs = ['rev-parse'];
 
-    const [err, stdout, stderr] = await createCwd(dir).execFile(cmd, cmdArgs);
+    const [err, stdout, stderr] = await createCwd(dir).runInShell('git rev-parse');
 
     if (err) {
         if (stderr.startsWith('fatal: Not a git repository')) {
@@ -30,12 +30,14 @@ async function isGitRepo (dir) {
 
 
 async function runCounter () {
-    const [err, stdout, stderr] = await cwd.execFile('node')
+    const [err, stdout, stderr] = await cwd.runInShell('node a-process.js')
 
     if (err) {
         console.log('Task: runCounter()');
         console.log(stderr);
-        throw err;
+        if (stderr) {
+            throw err;
+        }
     }
 
     return (!stderr) ? true : false;
@@ -45,10 +47,10 @@ async function runCounter () {
 
 (async () => {
     try {
-        const isRepo = await isGitRepo(__dirname);
-        // const answer = await runCounter(process.cwd());
+        // const answer = await isGitRepo(__dirname);
+        const answer = await runCounter(process.cwd());
 
-        console.log('Did You Get It? -', isRepo);
+        console.log('Did You Get It? -', answer);
     }
     catch (err) {
         console.log('EXCEPTION');

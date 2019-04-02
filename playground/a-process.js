@@ -8,7 +8,7 @@ const ref = setInterval(() => {
     }
 
     if (count === 2) {
-        process.stderr.write('errrrr')
+        // process.stderr.write('errrrr')
         process.exit(0)
         // throw new Error('333!!!')
     }
