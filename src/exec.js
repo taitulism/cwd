@@ -6,10 +6,10 @@ const logAndDie = require('./_log-and-die');
 module.exports = function execWrapper (...args) {
     const [cmd, cmdArgs, opts, callback] = this.resolveArguments(...args);
     
-    if (!cmd) throw new Error('Cwd.execFile(): Command cannot be empty.');
-    
+    if (!cmd) throw new Error('Cwd.exec(): Command cannot be empty.');
+
     return new Promise((resolve, reject) => {
-        execFile(cmd, args, opts, (err, stdout, stderr) => {
+        exec(cmd, cmdArgs, opts, (err, stdout, stderr) => {
             if (this.isBadCmd(cmd, err)) {
 
                 if (opts.cwd !== this.dirPath) {
@@ -26,7 +26,7 @@ module.exports = function execWrapper (...args) {
                     }
                 }
 
-                const errMsg = getBadCmdLogMsg(cmd, args, opts);
+                const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
                 const exception = new Error(errMsg);
 
                 return reject(exception);
