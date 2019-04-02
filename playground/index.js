@@ -4,25 +4,27 @@ const logException = require('../src/log-exception');
 const {execFile, spawn, fork} = require('child_process');
 const {exists} = require('fs');
 
-function isGitRepo (dir) {
-    const cmd = 'gsit';
-    const cmdArgs = ['rev-parse'];
-    
-    return cwd(dir).execFile(cmd, cmdArgs, (err, stdout, stderr) => {
-        if (err) {
-            console.log('task error');
-            if (stderr.includes('Not a git repository')) {
-                return resolve([null, false]);
-            }
-
-            return reject([`git rev-parse: ${dir}`, err]);
-        }
-
-        resolve([null, true]);
-    });
-};
 
 const cwd = createCwd(__dirname);
+
+
+async function isGitRepo (dir) {
+    const cmd = 'git';
+    const cmdArgs = ['rev-parse'];
+
+    const [err, stdout, stderr] = await createCwd(dir).execFile(cmd, cmdArgs);
+
+    if (err) {
+        console.log('errrrrr');
+        throw err;
+    }
+
+    console.log('stderr', stderr);
+    console.log('stdout', stdout);
+    
+    return true;
+};
+
 
 async function runCounter () {
     const [err, stdout, stderr] = await cwd.execFile('node')
@@ -40,10 +42,10 @@ async function runCounter () {
 
 (async () => {
     try {
-        // const isRepo = await isGitRepo(process.cwd());
-        const answer = await runCounter(process.cwd());
+        const isRepo = await isGitRepo(__dirname);
+        // const answer = await runCounter(process.cwd());
 
-        // console.log('Did You Get It? -', answer);
+        console.log('Did You Get It? -', isRepo);
     }
     catch (err) {
         console.log('EXCEPTION');
