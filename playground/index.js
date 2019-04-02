@@ -15,7 +15,10 @@ async function isGitRepo (dir) {
     const [err, stdout, stderr] = await createCwd(dir).execFile(cmd, cmdArgs);
 
     if (err) {
-        console.log('errrrrr');
+        if (stderr.startsWith('fatal: Not a git repository')) {
+            return false;
+        }
+        
         throw err;
     }
 
