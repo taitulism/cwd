@@ -19,6 +19,7 @@ Cwd.prototype = {
     resolveArguments (userArgs, userOpts, userCallback) {
         let cmd = null,
             args = [],
+            opts = null,
             defaultOpts = { cwd: this.dirPath },
             callback = null;
             
@@ -42,6 +43,8 @@ Cwd.prototype = {
         if (Array.isArray(userArgs)) {
             args = userArgs;
         }
+
+        opts = opts || defaultOpts;
 
         return [args, opts, callback];
     },

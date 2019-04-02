@@ -9,8 +9,9 @@ module.exports = function execFileWrapper (cmd, userArgs, userOpts, userCallback
 
     return new Promise((resolve, reject) => {
         execFile(cmd, args, opts, (err, stdout, stderr) => {
+            console.log('exec err', err);
             if (this.isBadCmd(cmd, err)) {
-                const errMsg = getBadCmdLogMsg(cmd, args);
+                const errMsg = getBadCmdLogMsg(cmd, args, opts);
                 const exception = new Error(errMsg);
 
                 return reject(exception);
@@ -23,7 +24,7 @@ module.exports = function execFileWrapper (cmd, userArgs, userOpts, userCallback
 };
 
 
-function getBadCmdLogMsg (cmd, args) {
+function getBadCmdLogMsg (cmd, args, opts) {
     const argsLen = args.length;
     const argsStr = (argsLen === 0)
         ? ''
@@ -39,5 +40,6 @@ function getBadCmdLogMsg (cmd, args) {
 
         \r      cmd: ${cmd}
         \r      args: [${argsStr}]
+        \r      opts: ${JSON.stringify(opts)}
     `;
 }
