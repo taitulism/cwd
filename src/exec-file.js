@@ -12,7 +12,7 @@ module.exports = function execFileWrapper (cmd, userArgs, userOpts, userCallback
             if (this.isBadCmd(cmd, err)) {
                 const errMsg = getBadCmdLogMsg(cmd, args);
                 const exception = new Error(errMsg);
-                
+
                 return reject(exception);
             }
 
@@ -24,12 +24,20 @@ module.exports = function execFileWrapper (cmd, userArgs, userOpts, userCallback
 
 
 function getBadCmdLogMsg (cmd, args) {
+    const argsLen = args.length;
+    const argsStr = (argsLen === 0)
+        ? ''
+        : (argsLen === 1)
+            ? ` ${args[0]} `
+            : `
+                \r\t\t${args.join('\n\t\t')}
+                \r\t    `;
+
+                
     return `
         \r  Cwd.execFile(cmd): Command not found
 
         \r      cmd: ${cmd}
-        \r      args: [
-        \r              ${args.join('\n\t      ')}
-        \r            ]
+        \r      args: [${argsStr}]
     `;
 }

@@ -22,7 +22,7 @@ function isGitRepo (dir) {
 const cwd = createCwd(__dirname);
 
 async function runCounter () {
-    const [err, stdout, stderr] = await cwd.execFile('node', ['a-process.js'])
+    const [err, stdout, stderr] = await cwd.execFile('node')
 
     if (err) {
         console.log('Task: runCounter()');
