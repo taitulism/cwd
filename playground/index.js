@@ -1,4 +1,5 @@
 const createCwd = require('../');
+
 const logException = require('../src/log-exception');
 const {execFile, spawn, fork} = require('child_process');
 const {exists} = require('fs');
@@ -24,7 +25,7 @@ function isGitRepo (dir) {
 const cwd = createCwd(__dirname);
 
 async function runCounter () {
-    const [err, stdout, stderr] = await cwd.execFile('node', {cwd:'qwe'})
+    const [err, stdout, stderr] = await cwd.execFile('node')
 
     if (err) {
         console.log('Task: runCounter()');
@@ -40,34 +41,9 @@ async function runCounter () {
 (async () => {
     try {
         // const isRepo = await isGitRepo(process.cwd());
-        // const answer = await runCounter(process.cwd());
-
-        // console.time('shell test')
-        // execFile("test", ['-d', './src'], (err, stdout, stderr) => {
-        //     if (err) {
-        //         console.log('callback error');
-        //         throw err;                
-        //     }
-            
-            
-        //     console.timeEnd('shell test')
-        // })
-
-        // console.time('fs.exists')
-        // exists('./src', (isThere) => {
-        //     if (!isThere) {
-        //         throw err;                
-        //     }
-            
-        //     console.timeEnd('fs.exists')
-        // })
+        const answer = await runCounter(process.cwd());
 
         // console.log('Did You Get It? -', answer);
-
-
-        const f = fork('playground/child.js');
-
-        f.send('hi');
     }
     catch (err) {
         console.log('EXCEPTION');
@@ -79,13 +55,3 @@ async function runCounter () {
         // logException('Process Failed', err)
     }
 })()
-
-/* TODO:
- * benchmark
- *      node child_process.exec("test -d "folder")
- *          vs.
- *      node fs.existsSync("folder")
- * 
- * runner process
- *  spawn a process once - use it many time. (stdin)
-*/

@@ -1,4 +1,5 @@
 const { execFile } = require('child_process');
+const { existsSync } = require('fs');
 const logAndDie = require('./_log-and-die');
 
 // this === Cwd instance
@@ -9,8 +10,22 @@ module.exports = function execFileWrapper (cmd, userArgs, userOpts, userCallback
 
     return new Promise((resolve, reject) => {
         execFile(cmd, args, opts, (err, stdout, stderr) => {
-            console.log('exec err', err);
             if (this.isBadCmd(cmd, err)) {
+
+                if (opts.cwd !== this.dirPath) {
+                    const exists = existsSync(opts.cwd);
+
+                    if (!exists) {
+                        const errMsg = `\n
+                            \r  Cwd.execFile(options.cwd): Directory not found
+                            \r      dir: ${opts.cwd}
+                        `;
+
+                        const exception = new Error(errMsg);
+                        return reject(exception);
+                    }
+                }
+
                 const errMsg = getBadCmdLogMsg(cmd, args, opts);
                 const exception = new Error(errMsg);
 
@@ -35,7 +50,7 @@ function getBadCmdLogMsg (cmd, args, opts) {
                 \r\t    `;
 
                 
-    return `
+    return `\n
         \r  Cwd.execFile(cmd): Command not found
 
         \r      cmd: ${cmd}
