@@ -27,7 +27,7 @@ async function isGitRepo (dir) {
 
 
 async function runCounter () {
-    const [err, stdout, stderr] = await cwd.runInShell('node a-process.js')
+    const p = await cwd.spawnProcess('node', ['a-process.js'])
 
     if (err) {
         console.log('Task: runCounter()');
