@@ -7,8 +7,6 @@ module.exports = function spawnProcess (...args) {
 
     return new Promise((resolve, reject) => {
         const childProc = spawn(cmd, cmdArgs, opts).on('error', err => {
-            console.log('on error');
-            console.log(err);
             if (this.isBadCmd(cmd, err)) {
                 if (opts.cwd !== this.dirPath) {
                     const exists = existsSync(opts.cwd);
