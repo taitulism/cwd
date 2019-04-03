@@ -1,8 +1,6 @@
 const {spawn} = require('child_process');
 
 const createCwd = require('../');
-const logException = require('../src/log-exception');
-
 const cwd = createCwd(__dirname);
 
 async function isGitRepo (dir) {
@@ -81,10 +79,5 @@ async function runCounter () {
     catch (err) {
         console.log('EXCEPTION');
         console.log(err);
-
-
-
-
-        // logException('Process Failed', err)
     }
 })()
