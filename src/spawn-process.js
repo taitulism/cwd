@@ -21,6 +21,7 @@ module.exports = function spawnProcess (...args) {
 
             const errMsg = this.getBadCmdLogMsg(cmd, cmdArgs, opts);
             const exception = new Error(errMsg);
+            
             throw exception;
         }
 

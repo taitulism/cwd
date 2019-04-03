@@ -25,8 +25,8 @@ async function isGitRepo (dir) {
 
 
 async function runCounter () {
-    return new Promise(async (resolve, reject) => {
-        const p = await cwd.spawnProcess('node', ['a-process.js']);
+    return new Promise((resolve, reject) => {
+        const p = cwd.spawnProcess('node', ['a-process.js']);
 
         let count = 0;
         p.on('stdOut', (lines) => {
@@ -43,6 +43,7 @@ async function runCounter () {
         });
 
         p.on('close', (code) => {
+            return resolve({errors, count})
             if (p.hasErrors) {
                 console.log('p.stdErr', errors);
                 return resolve(false)
@@ -51,13 +52,7 @@ async function runCounter () {
             if (code === 0) {
                 return resolve(count)
             }
-
-            console.log(`Task: runCounter() exit code: ${code}`);
-            console.log('errors', errors);
-            return resolve(false)
         });
-
-        return true;
     });
 }
 
