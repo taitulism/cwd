@@ -6,7 +6,7 @@ process.stdout.write('a-process FIRST line\n')
 const ref = setInterval(() => {
     if (count === 3 || count === 7) {
         console.log(count);
-        process.stderr.write('errrrr\n');
+        // process.stderr.write('errrrr\n');
     }
     else {
         console.log('Count: ', count);

@@ -25,7 +25,7 @@ module.exports = function runCmd (...args) {
                     }
                 }
 
-                const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
+                const errMsg = this.getBadCmdLogMsg(cmd, cmdArgs, opts);
                 const exception = new Error(errMsg);
 
                 return reject(exception);
@@ -40,24 +40,3 @@ module.exports = function runCmd (...args) {
             : execFile(cmd, cmdArgs, opts, execCallback);
     });
 };
-
-
-function getBadCmdLogMsg (cmd, args, opts) {
-    const argsLen = args.length;
-    const argsStr = (argsLen === 0)
-        ? ''
-        : (argsLen === 1)
-            ? ` ${args[0]} `
-            : `
-                \r\t\t${args.join('\n\t\t')}
-                \r\t    `;
-
-                
-    return `\n
-        \r  Cwd.runCmd(cmd): Command not found
-
-        \r      cmd: ${cmd}
-        \r      args: [${argsStr}]
-        \r      opts: ${JSON.stringify(opts)}
-    `;
-}

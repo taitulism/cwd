@@ -28,13 +28,7 @@ async function runCounter () {
     return new Promise(async (resolve, reject) => {
         const p = await cwd.spawnProcess('node', ['a-process.js']);
 
-        if (err) {
-            console.log('cwd.spawnProcess err');
-            reject(err);
-        }
-
         let count = 0;
-
         p.on('stdOut', (lines) => {
             lines.forEach(line => {
                 if (line.startsWith('Count:')) {
@@ -49,7 +43,7 @@ async function runCounter () {
         });
 
         p.on('close', (code) => {
-            if (p.stdErr) {
+            if (p.hasErrors) {
                 console.log('p.stdErr', errors);
                 return resolve(false)
             }
