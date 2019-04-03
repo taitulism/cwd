@@ -1,19 +1,27 @@
-let count = 5;
+let count = 10;
+
+process.stdout.write('a-process FIRST line\n')
+
 
 const ref = setInterval(() => {
-    console.log('Count: ', count);
-
-    if (count <= 0) {
-        clearInterval(ref);
+    if (count === 3 || count === 7) {
+        console.log(count);
+        process.stderr.write('errrrr\n');
     }
-
-    if (count === 2) {
-        // process.stderr.write('errrrr')
-        process.exit(0)
-        // throw new Error('333!!!')
+    else {
+        console.log('Count: ', count);
     }
 
     count--;
+
+    if (count <= 0) {
+        clearInterval(ref);
+        // process.stderr.write('errrrr'); process.exit(1);
+        // throw new Error('333!!!')
+        
+        process.stdout.write('a-process LAST line\n'); process.exit(0);
+    }
+
 }, 200);
 
 

@@ -4,6 +4,7 @@ const resolveArguments = require('./resolve-args');
 const execFile = require('./exec-file');
 const runCmd = require('./run-cmd');
 const runInShell = require('./run-in-shell');
+const spawnProcess = require('./spawn-process');
 
 function Cwd (dirPath) {
     const folderExists = existsSync(dirPath);
@@ -17,10 +18,12 @@ module.exports = Cwd;
 
 Cwd.prototype = {
     constructor: Cwd,
+    
     resolveArguments,
     execFile,
     runCmd,
     runInShell,
+    spawnProcess,
 
     isBadCmd (cmd, err) {
         if (!err) return false;
