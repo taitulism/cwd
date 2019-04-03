@@ -1,12 +1,9 @@
+const {spawn} = require('child_process');
+
 const createCwd = require('../');
-
 const logException = require('../src/log-exception');
-const {execFile, spawn, fork} = require('child_process');
-const {exists} = require('fs');
-
 
 const cwd = createCwd(__dirname);
-
 
 async function isGitRepo (dir) {
     const cmd = 'git';
