@@ -6,13 +6,13 @@ module.exports = function spawnProcess (...args) {
     if (!cmd) throw new Error('Cwd.spawnProcess(): Command cannot be empty.');
 
     return new Promise((resolve, reject) => {
-        const childProc = spawn(cmd, cmdArgs, opts).on('error', err => {
-            console.log('on error');
-            console.log(err);
+        const childProc = spawn(cmd, cmdArgs, opts);
+        
+        childProc.on('error', err => {
             if (this.isBadCmd(cmd, err)) {
                 if (opts.cwd !== this.dirPath) {
                     const exists = existsSync(opts.cwd);
-
+                    
                     if (!exists) {
                         const errMsg = `\n
                             \r  Cwd.spawnProcess(options.cwd): Directory not found
@@ -23,9 +23,11 @@ module.exports = function spawnProcess (...args) {
                         return reject(exception);
                     }
                 }
-
-                const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
+                
+                const errMsg = this.getBadCmdLogMsg(cmd, cmdArgs, opts);
                 const exception = new Error(errMsg);
+                
+                console.log('errrrrrrr', err);
 
                 return reject(exception);
             }
@@ -40,7 +42,7 @@ module.exports = function spawnProcess (...args) {
         // childProc.stdout.on('data', getChannelLines(childProc, 'stdout'));
         // childProc.stderr.on('data', getChannelLines(childProc, 'stderr'));
 
-        return resolve([null, childProc]);
+        return resolve(childProc);
     });
 }
 
