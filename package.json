@@ -1,7 +1,7 @@
 {
 	"name": "cwd",
 	"version": "0.0.0",
-	"description": "A wrapper for Node's \"child_process\" module",
+	"description": "A wrapper for Node's `child_process` module",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
