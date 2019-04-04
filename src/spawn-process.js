@@ -1,7 +1,7 @@
 const {spawn} = require('child_process');
 
 module.exports = function spawnProcess (...args) {
-    const [cmd, cmdArgs, opts, callback, needShell] = this.resolveArguments(...args);
+    const [cmd, cmdArgs, opts, needShell] = this.resolveArguments(...args);
     
     if (!cmd) throw new Error('Cwd.spawnProcess(): Command cannot be empty.');
 
@@ -21,15 +21,18 @@ module.exports = function spawnProcess (...args) {
 
             const errMsg = this.getBadCmdLogMsg(cmd, cmdArgs, opts);
             const exception = new Error(errMsg);
-            
+
             throw exception;
         }
 
         throw err;
     });
 
-    registerLinesEvent(childProc, 'stdout', 'stdOut', 'hasData');
-    registerLinesEvent(childProc, 'stderr', 'stdErr', 'hasErrors');
+    if (childProc.stdout)
+        registerLinesEvent(childProc, 'stdout', 'stdOut', 'hasData');
+    
+    if (childProc.stderr)
+        registerLinesEvent(childProc, 'stderr', 'stdErr', 'hasErrors');
 
     return childProc;
 }

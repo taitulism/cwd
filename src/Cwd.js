@@ -5,6 +5,7 @@ const execFile = require('./exec-file');
 const runCmd = require('./run-cmd');
 const runInShell = require('./run-in-shell');
 const spawnProcess = require('./spawn-process');
+const spawnShell = require('./spawn-shell');
 
 function Cwd (dirPath) {
     const folderExists = existsSync(dirPath);
@@ -24,6 +25,7 @@ Cwd.prototype = {
     runCmd,
     runInShell,
     spawnProcess,
+    spawnShell,
 
     isBadCmd (cmd, err) {
         if (!err) return false;
