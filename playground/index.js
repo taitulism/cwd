@@ -24,7 +24,7 @@ async function isGitRepo (dir) {
 };
 
 
-async function runCounter () {
+function runCounter () {
     return new Promise((resolve, reject) => {
         const p = cwd.spawnProcess('node', ['a-process.js']);
 
