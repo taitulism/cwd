@@ -1,6 +1,5 @@
 const { execFile } = require('child_process');
 const { existsSync } = require('fs');
-const logAndDie = require('./_log-and-die');
 
 // this === Cwd instance
 module.exports = function execFileWrapper (...args) {

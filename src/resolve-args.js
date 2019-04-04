@@ -7,7 +7,7 @@ function isArray (x) {
 }
 
 function isObject (x) {
-    return typeof x === 'object';
+    return Object.prototype.toString.call(x) === '[object Object]';
 }
 
 function containsShellOperators (str) {

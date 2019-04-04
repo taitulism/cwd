@@ -1,57 +1,49 @@
-const {spawn} = require('child_process');
+const { spawn } = require('child_process');
+const { isBadCmd, getBadCmdLogMsg, isBadDirectory } = require('./helpers');
 
 module.exports = function spawnProcess (...args) {
-    const [cmd, cmdArgs, opts, callback, needShell] = this.resolveArguments(...args);
+    const [cmd, cmdArgs, opts, needShell] = this.resolveArguments(...args);
     
     if (!cmd) throw new Error('Cwd.spawnProcess(): Command cannot be empty.');
 
-    return new Promise((resolve, reject) => {
-        const childProc = spawn(cmd, cmdArgs, opts);
-        
-        childProc.on('error', err => {
-            if (this.isBadCmd(cmd, err)) {
-                if (opts.cwd !== this.dirPath) {
-                    const exists = existsSync(opts.cwd);
-                    
-                    if (!exists) {
-                        const errMsg = `\n
-                            \r  Cwd.spawnProcess(options.cwd): Directory not found
-                            \r      dir: ${opts.cwd}
-                        `;
+    const childProc = spawn(cmd, cmdArgs, opts)
+    
+    childProc.on('error', err => {
+        if (isBadCmd(cmd, err)) {
+            if (isBadDirectory(opts, this.dirPath)) {
+                const errMsg = `\n
+                    \r  Cwd.spawnProcess(options.cwd): Directory not found
+                    \r      dir: ${opts.cwd}
+                `;
 
-                        const exception = new Error(errMsg);
-                        return reject(exception);
-                    }
-                }
-                
-                const errMsg = this.getBadCmdLogMsg(cmd, cmdArgs, opts);
                 const exception = new Error(errMsg);
-                
-                console.log('errrrrrrr', err);
-
-                return reject(exception);
+                throw exception;
             }
 
-            console.log('childProc onError throwing...');
-            resolve([err, null]);
-        });
+            const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
+            const exception = new Error(errMsg);
 
-        registerLinesEvent(childProc, 'stdout', 'stdOut');
-        registerLinesEvent(childProc, 'stderr', 'stdErr');
+            throw exception;
+        }
 
-        // childProc.stdout.on('data', getChannelLines(childProc, 'stdout'));
-        // childProc.stderr.on('data', getChannelLines(childProc, 'stderr'));
-
-        return resolve(childProc);
+        throw err;
     });
+
+    if (childProc.stdout)
+        registerLinesEvent(childProc, 'stdout', 'stdOut', 'hasData');
+    
+    if (childProc.stderr)
+        registerLinesEvent(childProc, 'stderr', 'stdErr', 'hasErrors');
+
+    return childProc;
 }
 
-function registerLinesEvent (proc, channel, eventName) {
+function registerLinesEvent (proc, channel, eventName, flagName) {
     let lineBuffer = '';
 
-    proc[eventName] = false;
+    proc[flagName] = false;
     proc[channel].once('data', (chunk) => {
-        proc[eventName] = true;
+        proc[flagName] = true;
     });
 
     proc[channel].setEncoding('utf8').on('data', (chunk) => {
@@ -64,21 +56,4 @@ function registerLinesEvent (proc, channel, eventName) {
 
         lineBuffer = lastLine;
     });
-};
-
-function getChannelLines (proc, channel) {
-    proc[channel].setEncoding('utf8');
-
-    let lineBuffer = '';
-    
-    return function chunkHandler (chunk) {
-        lineBuffer += chunk;
-        
-        const lines = lineBuffer.split('\n');
-        const lastLine = lines.pop();
-        
-        proc.emit(`${channel}/lines`, lines.filter(line => line != ''));
-
-        lineBuffer = lastLine;
-    };
 };

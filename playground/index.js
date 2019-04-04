@@ -1,8 +1,6 @@
 const {spawn} = require('child_process');
 
 const createCwd = require('../');
-const logException = require('../src/log-exception');
-
 const cwd = createCwd(__dirname);
 
 async function isGitRepo (dir) {
@@ -26,19 +24,11 @@ async function isGitRepo (dir) {
 };
 
 
-async function runCounter () {
-    return new Promise(async (resolve, reject) => {
-        const p = await cwd.spawnProcess('nsode', ['a-process.js']);
-        console.log('continue');
-
-
-        // if (err) {
-        //     console.log('cwd.spawnProcess err');
-        //     reject(err);
-        // }
+function runCounter () {
+    return new Promise((resolve, reject) => {
+        const p = cwd.spawnProcess('node', ['a-process.js']);
 
         let count = 0;
-
         p.on('stdOut', (lines) => {
             lines.forEach(line => {
                 if (line.startsWith('Count:')) {
@@ -53,13 +43,14 @@ async function runCounter () {
         });
 
         p.on('close', (code) => {
-            if (code === 0) {
-                return resolve(count)
-            }
-
-            if (p.stdErr) {
+            return resolve({errors, count})
+            if (p.hasErrors) {
                 console.log('p.stdErr', errors);
                 return resolve(false)
+            }
+
+            if (code === 0) {
+                return resolve(count)
             }
         });
     });
@@ -77,10 +68,5 @@ async function runCounter () {
     catch (err) {
         console.log('EXCEPTION');
         console.log(err);
-
-
-
-
-        // logException('Process Failed', err)
     }
 })()
