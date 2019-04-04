@@ -1,4 +1,5 @@
-const {spawn} = require('child_process');
+const { spawn } = require('child_process');
+const { isBadCmd, getBadCmdLogMsg, isBadDirectory } = require('./helpers');
 
 module.exports = function spawnProcess (...args) {
     const [cmd, cmdArgs, opts, needShell] = this.resolveArguments(...args);
@@ -8,7 +9,7 @@ module.exports = function spawnProcess (...args) {
     const childProc = spawn(cmd, cmdArgs, opts)
     
     childProc.on('error', err => {
-        if (this.isBadCmd(cmd, err)) {
+        if (isBadCmd(cmd, err)) {
             if (isBadDirectory(opts, this.dirPath)) {
                 const errMsg = `\n
                     \r  Cwd.spawnProcess(options.cwd): Directory not found
@@ -19,7 +20,7 @@ module.exports = function spawnProcess (...args) {
                 throw exception;
             }
 
-            const errMsg = this.getBadCmdLogMsg(cmd, cmdArgs, opts);
+            const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
             const exception = new Error(errMsg);
 
             throw exception;
@@ -56,11 +57,3 @@ function registerLinesEvent (proc, channel, eventName, flagName) {
         lineBuffer = lastLine;
     });
 };
-
-function isBadDirectory (opts, dirPath) {
-    if (opts.cwd === dirPath) return false;
-
-    const exists = existsSync(opts.cwd);
-
-    return !exists;
-}

@@ -1,5 +1,5 @@
 const { exec, execFile } = require('child_process');
-const { existsSync } = require('fs');
+const { isBadCmd, getBadCmdLogMsg } = require('./helpers');
 
 // this === Cwd instance
 module.exports = function runCmd (...args) {
@@ -9,23 +9,18 @@ module.exports = function runCmd (...args) {
 
     return new Promise((resolve, reject) => {
         const execCallback = (err, stdout, stderr) => {
-            if (this.isBadCmd(cmd, err)) {
+            if (isBadCmd(cmd, err)) {
+                if (isBadDirectory(opts, this.dirPath)) {
+                    const errMsg = `\n
+                        \r  Cwd.runCmd(options.cwd): Directory not found
+                        \r      dir: ${opts.cwd}
+                    `;
 
-                if (opts.cwd !== this.dirPath) {
-                    const exists = existsSync(opts.cwd);
-
-                    if (!exists) {
-                        const errMsg = `\n
-                            \r  Cwd.runCmd(options.cwd): Directory not found
-                            \r      dir: ${opts.cwd}
-                        `;
-
-                        const exception = new Error(errMsg);
-                        return reject(exception);
-                    }
+                    const exception = new Error(errMsg);
+                    return reject(exception);
                 }
 
-                const errMsg = this.getBadCmdLogMsg(cmd, cmdArgs, opts);
+                const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
                 const exception = new Error(errMsg);
 
                 return reject(exception);
