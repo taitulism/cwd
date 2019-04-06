@@ -1,10 +1,11 @@
 {
 	"name": "cwd",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"description": "A wrapper for Node's `child_process` module",
 	"main": "index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"tdd": "mocha ./tests --watch",
+		"test": "mocha"
 	},
 	"repository": {
 		"type": "git",
@@ -15,5 +16,10 @@
 	"bugs": {
 		"url": "https://github.com/taitulism/cwd/issues"
 	},
-	"homepage": "https://github.com/taitulism/cwd#readme"
+	"homepage": "https://github.com/taitulism/cwd#readme",
+	"devDependencies": {
+		"chai": "^4.2.0",
+		"mocha": "^5.2.0",
+		"sinon": "^6.3.4"
+	}
 }

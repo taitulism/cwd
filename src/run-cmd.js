@@ -1,5 +1,5 @@
 const { exec, execFile } = require('child_process');
-const { isBadCmd, getBadCmdLogMsg } = require('./helpers');
+const { isBadCmd, isBadDirectory, getBadCmdLogMsg } = require('./helpers');
 
 // this === Cwd instance
 module.exports = function runCmd (...args) {
@@ -20,7 +20,7 @@ module.exports = function runCmd (...args) {
                     return reject(exception);
                 }
 
-                const errMsg = this.getBadCmdLogMsg(cmd, cmdArgs, opts);
+                const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
                 const exception = new Error(errMsg);
 
                 return reject(exception);

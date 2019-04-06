@@ -8,26 +8,26 @@ module.exports = function spawnProcess (...args) {
 
     const childProc = spawn(cmd, cmdArgs, opts)
     
-    childProc.on('error', err => {
-        if (isBadCmd(cmd, err)) {
-            if (isBadDirectory(opts, this.dirPath)) {
-                const errMsg = `\n
-                    \r  Cwd.spawnProcess(options.cwd): Directory not found
-                    \r      dir: ${opts.cwd}
-                `;
+    // childProc.on('error', err => {
+    //     if (isBadCmd(cmd, err)) {
+    //         if (isBadDirectory(opts, this.dirPath)) {
+    //             const errMsg = `\n
+    //                 \r  Cwd.spawnProcess(options.cwd): Directory not found
+    //                 \r      dir: ${opts.cwd}
+    //             `;
 
-                const exception = new Error(errMsg);
-                throw exception;
-            }
+    //             const exception = new Error(errMsg);
+    //             throw exception;
+    //         }
 
-            const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
-            const exception = new Error(errMsg);
+    //         const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
+    //         const exception = new Error(errMsg);
 
-            throw exception;
-        }
+    //         throw exception;
+    //     }
 
-        throw err;
-    });
+    //     throw err;
+    // });
 
     if (childProc.stdout)
         registerLinesEvent(childProc, 'stdout', 'stdOut', 'hasData');
@@ -39,13 +39,12 @@ module.exports = function spawnProcess (...args) {
 }
 
 function registerLinesEvent (proc, channel, eventName, flagName) {
-    let lineBuffer = '';
-
     proc[flagName] = false;
     proc[channel].once('data', (chunk) => {
         proc[flagName] = true;
     });
-
+    
+    let lineBuffer = '';
     proc[channel].setEncoding('utf8').on('data', (chunk) => {
         lineBuffer += chunk;
         
