@@ -1,5 +1,5 @@
 const { spawn } = require('child_process');
-const { isBadCmd, getBadCmdLogMsg, isBadDirectory } = require('./helpers');
+// const { isBadCmd, getBadCmdLogMsg, isBadDirectory } = require('./helpers');
 
 module.exports = function spawnProcess (...args) {
     const [cmd, cmdArgs, opts, needShell] = this.resolveArguments(...args);
@@ -10,7 +10,7 @@ module.exports = function spawnProcess (...args) {
     
     // childProc.on('error', err => {
     //     if (isBadCmd(cmd, err)) {
-    //         if (isBadDirectory(opts, this.dirPath)) {
+    //         if (isBadDirectory(opts.cwd)) {
     //             const errMsg = `\n
     //                 \r  Cwd.spawnProcess(options.cwd): Directory not found
     //                 \r      dir: ${opts.cwd}

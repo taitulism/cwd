@@ -10,7 +10,7 @@ module.exports = function runCmd (...args) {
     return new Promise((resolve, reject) => {
         const execCallback = (err, stdout, stderr) => {
             if (isBadCmd(cmd, err)) {
-                if (isBadDirectory(opts, this.dirPath)) {
+                if (isBadDirectory(opts.cwd)) {
                     const errMsg = `\n
                         \r  Cwd.runCmd(options.cwd): Directory not found
                         \r      dir: ${opts.cwd}

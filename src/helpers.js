@@ -7,10 +7,8 @@ module.exports = {
         return err.message.startsWith(`spawn ${cmd} ENOENT`);
     },
 
-    isBadDirectory (opts, dirPath) {
-        if (opts.cwd === dirPath) return false;
-    
-        const exists = existsSync(opts.cwd);
+    isBadDirectory (dirPath) {
+        const exists = existsSync(dirPath);
     
         return !exists;
     },
