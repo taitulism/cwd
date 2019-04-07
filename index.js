@@ -9,6 +9,6 @@ module.exports = function cwd (dirPath) {
     const cwdInstance = new Cwd(dirPath);
 
     cwdInstances.set(dirPath, cwdInstance);
-    
+
     return cwdInstance;
 };

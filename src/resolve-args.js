@@ -3,7 +3,7 @@ function isFunction (x) {
 }
 
 function isArray (x) {
-    return Array.isArray(x);    
+    return Array.isArray(x);
 }
 
 function isObject (x) {
@@ -21,13 +21,13 @@ module.exports = function resolveArguments (userCmd, userArgs, userOpts, userCal
         defaultOpts = { cwd: this.dirPath },
         callback = null
         needShell = false;
-        
+
     if (!userCmd) return [null];
 
     const cleanCmd = userCmd.trim().replace(/\s{2,}/g, ' ');
 
     if (!cleanCmd) return [null];
-    
+
     if (containsShellOperators(cleanCmd)) {
         needShell = true;
     }
@@ -37,7 +37,7 @@ module.exports = function resolveArguments (userCmd, userArgs, userOpts, userCal
     }
     else {
         const cmdParts = cleanCmd.split(' ');
-        
+
         cmd = cmdParts.shift();
         cmdArgs = cmdParts;
     }

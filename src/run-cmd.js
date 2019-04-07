@@ -4,7 +4,7 @@ const { isBadCmd, isBadDirectory, getBadCmdLogMsg } = require('./helpers');
 // this === Cwd instance
 module.exports = function runCmd (...args) {
     const [cmd, cmdArgs, opts, callback, needShell] = this.resolveArguments(...args);
-    
+
     if (!cmd) throw new Error('Cwd.runCmd(): Command cannot be empty.');
 
     return new Promise((resolve, reject) => {

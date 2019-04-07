@@ -23,7 +23,7 @@ module.exports = Cwd;
 
 Cwd.prototype = {
     constructor: Cwd,
-    
+
     resolveArguments,
     execFile,
     runCmd,

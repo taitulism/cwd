@@ -3,11 +3,11 @@ const { spawn } = require('child_process');
 
 module.exports = function spawnProcess (...args) {
     const [cmd, cmdArgs, opts] = this.resolveArguments(...args);
-    
+
     if (!cmd) throw new Error('Cwd.spawnProcess(): Command cannot be empty.');
 
     const childProc = spawn(cmd, cmdArgs, opts)
-    
+
     /* childProc.on('error', err => {
         if (isBadCmd(cmd, err)) {
             if (isBadDirectory(opts.cwd)) {
@@ -31,7 +31,7 @@ module.exports = function spawnProcess (...args) {
 
     if (childProc.stdout)
         registerLinesEvent(childProc, 'stdout', 'stdOut', 'hasData');
-    
+
     if (childProc.stderr)
         registerLinesEvent(childProc, 'stderr', 'stdErr', 'hasErrors');
 
@@ -43,14 +43,14 @@ function registerLinesEvent (proc, channel, eventName, flagName) {
     proc[channel].once('data', (chunk) => {
         proc[flagName] = true;
     });
-    
+
     let lineBuffer = '';
     proc[channel].setEncoding('utf8').on('data', (chunk) => {
         lineBuffer += chunk;
-        
+
         const lines = lineBuffer.split('\n');
         const lastLine = lines.pop();
-        
+
         proc.emit(eventName, lines.filter(line => line != ''));
 
         lineBuffer = lastLine;

@@ -11,13 +11,13 @@ async function isGitRepo (dir) {
         if (stderr.startsWith('fatal: Not a git repository')) {
             return false;
         }
-        
+
         throw err;
     }
 
     console.log('stderr', stderr);
     console.log('stdout', stdout);
-    
+
     return true;
 };
 

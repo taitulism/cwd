@@ -9,7 +9,7 @@ module.exports = {
 
     isBadDirectory (dirPath) {
         const exists = existsSync(dirPath);
-    
+
         return !exists;
     },
 
@@ -26,11 +26,11 @@ module.exports = {
                 : `
                     \r\t\t${args.join('\n\t\t')}
                     \r\t    `;
-    
-                    
+
+
         return `\n
             \r  Cwd.runCmd(cmd): Command not found
-    
+
             \r      cmd: ${cmd}
             \r      args: [${argsStr}]
             \r      opts: ${JSON.stringify(opts)}

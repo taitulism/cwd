@@ -16,7 +16,7 @@ describe('\r=======\n- CWD -\n=======', () => {
             describe('When called with a /path/to/directory', () => {
                 it('it returns a `Cwd` instance', () => {
                     const cwdInstance = createCwd(TEST_DIR);
-    
+
                     expect(cwdInstance instanceof CwdClass).to.be.true;
                 });
             });
@@ -24,7 +24,7 @@ describe('\r=======\n- CWD -\n=======', () => {
             describe('When called with no params', () => {
                 it('it throws an error', () => {
                     const shouldThrow = () => createCwd();
-    
+
                     expect(shouldThrow).to.throw('Expecting one argument <String>, a directory path');
                 });
             });
@@ -32,7 +32,7 @@ describe('\r=======\n- CWD -\n=======', () => {
             describe('When called with /path/not/exists', () => {
                 it('it throws an error', () => {
                     const shouldThrow = () => createCwd('/path/not/exists');
-    
+
                     expect(shouldThrow).to.throw('No Such Directory');
                 });
             });
@@ -42,7 +42,7 @@ describe('\r=======\n- CWD -\n=======', () => {
                     const shouldThrow1 = () => createCwd(10);
                     const shouldThrow2 = () => createCwd('');
                     const shouldThrow3 = () => createCwd(' ');
-    
+
                     expect(shouldThrow1).to.throw('Expecting one argument <String>, a directory path');
                     expect(shouldThrow2).to.throw('Expecting one argument <String>, a directory path');
                     expect(shouldThrow3).to.throw('Expecting one argument <String>, a directory path');
@@ -51,7 +51,7 @@ describe('\r=======\n- CWD -\n=======', () => {
         });
     });
 
-    
+
     describe('Instance', () => {
         describe('API', () => {
             const cwdInstance = createCwd(TEST_DIR);
@@ -97,48 +97,48 @@ describe('\r=======\n- CWD -\n=======', () => {
                 describe('when command is legit (e.g. `$ ls`)', () => {
                     it('returns an array with length 3', async () => {
                         const returnValue = await cwdInstance.runCmd('ls');
-    
+
                         expect(Array.isArray(returnValue)).to.be.true;
                         expect(returnValue.length).to.equal(3);
                     });
-                    
+
                     describe('Returned Array', () => {
                         describe('[0] err', () => {
                             it('is null when exit code is 0 (ok)', async () => {
                                 const [returnValue, b, c] = await cwdInstance.runCmd('ls');
-                                
+
                                 expect(returnValue).to.be.null;
                             });
-    
+
                             it('is an Error when exit code is NOT 0', async () => {
                                 const [returnValue, b, c] = await cwdInstance.runCmd('ls', ['./bla']);
-                                
+
                                 expect(returnValue instanceof Error).to.be.true;
                                 expect(returnValue.message.includes('Command failed: ls ./bla')).to.be.true;
                             });
                         });
-                        
+
                         describe('[1] process.stdout', () => {
                             it('is a string', async () => {
                                 const [a, returnValue, ...c] = await cwdInstance.runCmd('ls');
-                                
+
                                 expect(typeof returnValue === 'string').to.be.true;
                             });
-    
+
                             it('is the command output', async () => {
                                 const [a, returnValue, ...c] = await cwdInstance.runCmd('ls');
-                                
+
                                 expect(returnValue.trim()).to.equal('index.test.js');
                             });
                         });
-                        
+
                         describe('[2] process.stderr', () => {
                             it('is a string', async () => {
                                 const [a, b, returnValue] = await cwdInstance.runCmd('ls');
-                                
+
                                 expect(typeof returnValue === 'string').to.be.true;
                             });
-                            
+
                             it('is the command errors', async () => {
                                 const [a, b, returnValue] = await cwdInstance.runCmd('ls', ['./bla']);
 
@@ -189,7 +189,7 @@ describe('\r=======\n- CWD -\n=======', () => {
                 describe('when command is legit (e.g. `$ ls`)', () => {
                     it('returns a native child_process', async () => {
                         const returnValue = await cwdInstance.spawnProcess('ls');
-    
+
                         expect(typeof returnValue === 'object').to.be.true;
                         expect(Object.getPrototypeOf(returnValue).constructor.name).to.equal('ChildProcess');
                     });
@@ -200,11 +200,11 @@ describe('\r=======\n- CWD -\n=======', () => {
 
                             let stdoutDataCount = 0;
                             let stdOutCount = 0;
-                            
+
                             p.stdout.on('data', () => {
                                 stdoutDataCount++;
                             });
-                            
+
                             p.on('stdOut', () => {
                                 stdOutCount++
                             });
@@ -223,7 +223,7 @@ describe('\r=======\n- CWD -\n=======', () => {
                             p.on('stdOut', (linesAry) => {
                                 lines = linesAry;
                             });
-                            
+
                             p.on('close', () => {
                                 expect(Array.isArray(lines)).to.be.true;
                                 expect(typeof lines[0]).to.equal('string');
@@ -231,7 +231,7 @@ describe('\r=======\n- CWD -\n=======', () => {
                             })
                         });
                     });
-                    
+
                     describe('Event: stdErr', () => {
                         it('emitted on regular stdout', (done) => {
                             const p = cwdInstance.spawnProcess('ls ./bla');
@@ -242,7 +242,7 @@ describe('\r=======\n- CWD -\n=======', () => {
                             p.stderr.on('data', () => {
                                 stderrDataCount++;
                             });
-                            
+
                             p.on('stdErr', () => {
                                 stdErrCount++
                             });
@@ -261,7 +261,7 @@ describe('\r=======\n- CWD -\n=======', () => {
                             p.on('stdErr', (linesAry) => {
                                 lines = linesAry;
                             });
-                            
+
                             p.on('close', () => {
                                 expect(Array.isArray(lines)).to.be.true;
                                 expect(typeof lines[0]).to.equal('string');
