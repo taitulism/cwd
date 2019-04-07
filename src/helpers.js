@@ -15,9 +15,16 @@ module.exports = {
 
     getCmdFailMsg (cmd, args, opts, callback) {
         return `Failed Command:\n  cmd: ${cmd}\n  args: ${args}\n  opts: ${opts}\n  callback: ${typeof callback}\n`;
-    },
+	},
 
-    getBadCmdLogMsg (cmd, args, opts) {
+	getBadDirLogMsg (method, cwd) {
+		return `\n
+			\r  Cwd.${method}(options.cwd): Directory not found
+			\r      Dir: ${cwd}
+		`;
+	},
+
+    getBadCmdLogMsg (method, cmd, args, opts) {
         const argsLen = args.length;
         const argsStr = (argsLen === 0)
             ? ''
@@ -29,7 +36,7 @@ module.exports = {
 
 
         return `\n
-            \r  Cwd.runCmd(cmd): Command not found
+            \r  Cwd.${method}(cmd): Command not found
 
             \r      cmd: ${cmd}
             \r      args: [${argsStr}]

@@ -11,16 +11,12 @@ module.exports = function runCmd (...args) {
         const execCallback = (err, stdout, stderr) => {
             if (isBadCmd(cmd, err)) {
                 if (isBadDirectory(opts.cwd)) {
-                    const errMsg = `\n
-                        \r  Cwd.runCmd(options.cwd): Directory not found
-                        \r      dir: ${opts.cwd}
-                    `;
-
+                    const errMsg = getBadDirLogMsg('runCmd', opts.cwd);
                     const exception = new Error(errMsg);
                     return reject(exception);
                 }
 
-                const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
+                const errMsg = getBadCmdLogMsg('runCmd', cmd, cmdArgs, opts);
                 const exception = new Error(errMsg);
 
                 return reject(exception);

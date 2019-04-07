@@ -11,11 +11,7 @@ module.exports = function spawnProcess (...args) {
     /* childProc.on('error', err => {
         if (isBadCmd(cmd, err)) {
             if (isBadDirectory(opts.cwd)) {
-                const errMsg = `\n
-                    \r  Cwd.spawnProcess(options.cwd): Directory not found
-                    \r      dir: ${opts.cwd}
-                `;
-
+	            const errMsg = getBadDirLogMsg('spawnProcess', opts.cwd);
                 const exception = new Error(errMsg);
                 throw exception;
             }
