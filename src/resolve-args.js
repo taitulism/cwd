@@ -70,5 +70,9 @@ module.exports = function resolveArguments (userCmd, userArgs, userOpts, userCal
 
     opts = opts || defaultOpts;
 
-    return [cmd, cmdArgs, opts, callback, needShell];
+    if (needShell && !opts.shell) {
+        opts.shell = true;
+    }
+
+    return [cmd, cmdArgs, opts, callback];
 }

@@ -2,32 +2,32 @@ const { spawn } = require('child_process');
 // const { isBadCmd, getBadCmdLogMsg, isBadDirectory } = require('./helpers');
 
 module.exports = function spawnProcess (...args) {
-    const [cmd, cmdArgs, opts, needShell] = this.resolveArguments(...args);
+    const [cmd, cmdArgs, opts] = this.resolveArguments(...args);
     
     if (!cmd) throw new Error('Cwd.spawnProcess(): Command cannot be empty.');
 
     const childProc = spawn(cmd, cmdArgs, opts)
     
-    // childProc.on('error', err => {
-    //     if (isBadCmd(cmd, err)) {
-    //         if (isBadDirectory(opts.cwd)) {
-    //             const errMsg = `\n
-    //                 \r  Cwd.spawnProcess(options.cwd): Directory not found
-    //                 \r      dir: ${opts.cwd}
-    //             `;
+    /* childProc.on('error', err => {
+        if (isBadCmd(cmd, err)) {
+            if (isBadDirectory(opts.cwd)) {
+                const errMsg = `\n
+                    \r  Cwd.spawnProcess(options.cwd): Directory not found
+                    \r      dir: ${opts.cwd}
+                `;
 
-    //             const exception = new Error(errMsg);
-    //             throw exception;
-    //         }
+                const exception = new Error(errMsg);
+                throw exception;
+            }
 
-    //         const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
-    //         const exception = new Error(errMsg);
+            const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
+            const exception = new Error(errMsg);
 
-    //         throw exception;
-    //     }
+            throw exception;
+        }
 
-    //     throw err;
-    // });
+        throw err;
+    }); */
 
     if (childProc.stdout)
         registerLinesEvent(childProc, 'stdout', 'stdOut', 'hasData');
