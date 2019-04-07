@@ -62,9 +62,9 @@ describe('\r=======\n- CWD -\n=======', () => {
                 });
             });
 
-            describe('.runInShell()', () => {
+            describe('.runShellCmd()', () => {
                 it('', () => {
-                    expect(typeof cwdInstance.runInShell === 'function').to.be.true;
+                    expect(typeof cwdInstance.runShellCmd === 'function').to.be.true;
                 });
             });
 
@@ -161,14 +161,14 @@ describe('\r=======\n- CWD -\n=======', () => {
                 });
             });
 
-            describe('.runInShell()', () => {
+            describe('.runShellCmd()', () => {
                 const cwdInstance = createCwd(TEST_DIR);
 
                 it('calls .runCmd() with shell', async () => {
                     cwdInstance.runCmd = sinon.spy();
 
                     expect(cwdInstance.runCmd.notCalled).to.be.true;
-                    await cwdInstance.runInShell('ls', ['./', '-la']);
+                    await cwdInstance.runShellCmd('ls', ['./', '-la']);
                     expect(cwdInstance.runCmd.called).to.be.true;
                     expect(cwdInstance.runCmd.callCount).to.equal(1);
 

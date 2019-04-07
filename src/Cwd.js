@@ -3,7 +3,7 @@ const { existsSync } = require('fs');
 const resolveArguments = require('./resolve-args');
 const execFile = require('../archive/exec-file');
 const runCmd = require('./run-cmd');
-const runInShell = require('./run-in-shell');
+const runShellCmd = require('./run-shell-cmd');
 const spawnProcess = require('./spawn-process');
 const spawnShell = require('./spawn-shell');
 
@@ -27,7 +27,7 @@ Cwd.prototype = {
     resolveArguments,
     execFile,
     runCmd,
-    runInShell,
+    runShellCmd,
     spawnProcess,
     spawnShell,
 };
