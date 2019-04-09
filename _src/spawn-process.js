@@ -1,54 +1,12 @@
 const { spawn } = require('child_process');
-const normalizeArgs = require('./normalize-arguments');
-const { validateCommand } = require('./helpers');
-
 // const { isBadCmd, getBadCmdLogMsg, isBadDirectory } = require('./helpers');
 
-function parseCmd (cmdStr) {
-	cmdStr = cmdStr.trim();
+module.exports = function spawnProcess (...args) {
+    const [cmd, cmdArgs, opts] = this.resolveArguments(...args);
 
-	let needShell = false,
-		cmdArgs = [];
+    if (!cmd) throw new Error('Cwd.spawnProcess(): Command cannot be empty.');
 
-	if (hasSpaces(cmdStr) || containsShellOperators(cmdStr)) {
-		needShell = true;
-
-		if (hasSpaces(cmdStr)) {
-			const cmdSplit = cmdStr.split(' ');
-
-			cmdStr = cmdSplit.shift();
-			cmdArgs = cmdSplit;
-		}
-	}
-
-	return [cmdStr, cmdArgs, needShell];
-}
-
-function hasSpaces (str) {
-    return /\s/.test(str);
-}
-
-function containsShellOperators (str) {
-    return /[|&>;]/.test(str);
-}
-
-
-module.exports = function spawnProcess (cmdStr, ...rest) {
-	validateCommand(cmdStr);
-
-	const [cmd, cmdArgs, needShell] = parseCmd(cmdStr);
-
-	const [argsAry, options] = normalizeArgs(...rest);
-
-	const finalArgs = cmdArgs.concat(argsAry);
-
-	if (options.shell == null) {
-		options.shell = needShell;
-	}
-
-	options.cwd = options.cwd || this.dirPath;
-
-	const childProc = spawn(cmd, finalArgs, options);
+    const childProc = spawn(cmd, cmdArgs, opts)
 
     /* childProc.on('error', err => {
         if (isBadCmd(cmd, err)) {

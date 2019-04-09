@@ -19,6 +19,7 @@
 	"homepage": "https://github.com/taitulism/cwd#readme",
 	"devDependencies": {
 		"chai": "^4.2.0",
+		"chai-as-promised": "^7.1.1",
 		"mocha": "^5.2.0",
 		"sinon": "^6.3.4"
 	}

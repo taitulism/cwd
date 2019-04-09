@@ -1,10 +1,11 @@
 const { existsSync } = require('fs');
 
-// const execFile = require('../archive/exec-file');
-// const runShellCmd = require('./run-shell-cmd');
+const resolveArguments = require('./resolve-args');
+const execFile = require('../archive/exec-file');
+const runCmd = require('./run-cmd');
+const runShellCmd = require('./run-shell-cmd');
 const spawnProcess = require('./spawn-process');
-const runCmd = require('./run-command');
-// const spawnShell = require('./spawn-shell');
+const spawnShell = require('./spawn-shell');
 
 function Cwd (dirPath) {
     if (typeof dirPath !== 'string' || dirPath.trim() === '') {
@@ -23,10 +24,10 @@ module.exports = Cwd;
 Cwd.prototype = {
     constructor: Cwd,
 
-    spawnProcess,
+    resolveArguments,
+    execFile,
     runCmd,
-    // resolveArguments,
-    // execFile,
-    // runShellCmd,
-    // spawnShell,
+    runShellCmd,
+    spawnProcess,
+    spawnShell,
 };
