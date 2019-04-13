@@ -6,32 +6,53 @@ const DIR = __dirname;
 
 const cwd = createCwd(DIR);
 
+
+
 (async () => {
-	try {
-		const [a, b, returnValue] = await cwd.runCmd('ls', ['./bla']);
-		console.log(111, a);
-		console.log(222, b);
-		console.log(333, returnValue);
-	} catch (ex) {
-		console.log('exception', ex);
+	// const answer = await runCounter(process.cwd());
+	exec('ls', (err, out, er) => {
 
+	})
 
-
-		setTimeout(() => {}, 3000);
-	}
-
-
-	/**
-	 * exception
-	 * exit 0/1
-	 * stdout
-	 * stderr
-	 */
-	const [ex, [err, data]] = await cwd.runCmd('ls', ['./bla']);
-
-	const [err, stdout, stderr] = await cwd.runCmd('ls', ['./blu']);
+	console.log('Did You Get It? -', answer);
 
 
 
 
 })()
+
+
+
+
+function runCounter () {
+    return new Promise((resolve, reject) => {
+        const p = cwd.spawnProcess('node', ['a-process.js']);
+
+        let count = 0;
+        p.on('stdOut', (lines) => {
+			console.log('lines', lines);
+            // lines.forEach(line => {
+            //     if (line.startsWith('Count:')) {
+            //         count++;
+            //     }
+            // });
+        });
+
+        let errors = [];
+        p.on('stdErr', (lines) => {
+            errors = errors.concat(lines)
+        });
+
+        p.on('close', (code) => {
+            return resolve({errors, count})
+            if (p.hasErrors) {
+                console.log('p.stdErr', errors);
+                return resolve(false)
+            }
+
+            if (code === 0) {
+                return resolve(count)
+            }
+        });
+    });
+}

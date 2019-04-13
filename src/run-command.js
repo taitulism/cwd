@@ -14,17 +14,20 @@ module.exports = function runCmd (cmdStr, ...rest) {
 			childProc.kill();
 		});
 
-		let stdout = '';
+		let stdoutLines = [];
 		childProc.on('stdOut', (lines) => {
-			stdout += lines.join('\n');
+			stdoutLines.push(...lines);
 		});
 
-		let stderr = '';
+		let stderrLines = [];
 		childProc.on('stdErr', (lines) => {
-			stderr += lines.join('\n');
+			stderrLines.push(...lines);
 		});
 
 		childProc.on('close', (code) => {
+			const stdout = stdoutLines.join('\n');
+			const stderr = stderrLines.join('\n');
+
 			return resolve([code === 0, stdout, stderr]);
 		});
 	});

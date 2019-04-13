@@ -33,24 +33,54 @@ module.exports = () => {
 				})
 			});
 
-			it('emitted on regular stdout', (done) => {
+			it('holds the stdout text', (done) => {
 				const p = cwdInstance.spawnProcess('ls');
 
-				let stdoutCount = 0;
-				let stdOutLineCount = 0;
+				let stdoutBuffer = '';
+				let stdOutLineBuffer = '';
 
-				p.stdout.on('data', () => {
-					stdoutCount++;
+				p.stdout.on('data', (chunk) => {
+					stdoutBuffer += chunk;
 				});
 
-				p.on('stdOut', () => {
-					stdOutLineCount++
+				p.on('stdOut', (lines) => {
+					stdOutLineBuffer += lines.join('\n') + '\n';
 				});
 
 				p.on('close', () => {
-					expect(stdOutLineCount).to.equal(stdoutCount);
+					// remove last newLine added above
+					stdOutLineBuffer = stdOutLineBuffer.trimRight();
+
+					expect(stdoutBuffer).to.have.string(stdOutLineBuffer);
+					expect(stdoutBuffer).to.not.equal(stdOutLineBuffer);
 					done();
-				})
+				});
+			});
+
+			it('filters out empty lines', (done) => {
+				const p = cwdInstance.spawnProcess('ls');
+
+				let stdoutBuffer = '';
+				let stdOutLines = [];
+
+				p.stdout.on('data', (chunk) => {
+					stdoutBuffer += chunk;
+				});
+
+				p.on('stdOut', (lines) => {
+					stdOutLines = stdOutLines.concat(lines);
+				});
+
+				p.on('close', () => {
+					const stdoutBufferLines = stdoutBuffer.split('\n');
+
+					expect(stdoutBufferLines).to.have.lengthOf(6);
+					expect(stdoutBufferLines[5]).to.equal('');
+
+					expect(stdOutLines).to.have.lengthOf(5);
+					expect(stdOutLines[4]).to.not.equal('');
+					done();
+				});
 			});
 		});
 
@@ -71,22 +101,50 @@ module.exports = () => {
 				})
 			});
 
-			it('emitted on regular stdout', (done) => {
+			it('holds the stderr text', (done) => {
 				const p = cwdInstance.spawnProcess('ls ./bla');
 
-				let stderrCount = 0;
-				let stdErrLineCount = 0;
+				let stderrBuffer = '';
+				let stdErrLineBuffer = '';
 
-				p.stderr.on('data', () => {
-					stderrCount++;
+				p.stderr.on('data', (chunk) => {
+					stderrBuffer += chunk;
 				});
 
-				p.on('stdErr', () => {
-					stdErrLineCount++
+				p.on('stdErr', (lines) => {
+					stdErrLineBuffer += '\n' + lines.join('\n');
+					stdErrLineBuffer = stdErrLineBuffer.trim();
 				});
 
 				p.on('close', () => {
-					expect(stdErrLineCount).to.equal(stderrCount);
+					expect(stderrBuffer).to.have.string(stdErrLineBuffer);
+					expect(stderrBuffer).to.not.equal(stdErrLineBuffer);
+					done();
+				});
+			});
+
+			it('filters out empty lines', (done) => {
+				const p = cwdInstance.spawnProcess('ls ./bla');
+
+				let stderrBuffer = '';
+				let stdErrLines = [];
+
+				p.stderr.on('data', (chunk) => {
+					stderrBuffer += chunk;
+				});
+
+				p.on('stdErr', (lines) => {
+					stdErrLines = stdErrLines.concat(lines);
+				});
+
+				p.on('close', () => {
+					const stdoutBufferLines = stderrBuffer.split('\n');
+
+					expect(stdoutBufferLines).to.have.lengthOf(2);
+					expect(stdoutBufferLines[1]).to.equal('');
+
+					expect(stdErrLines).to.have.lengthOf(1);
+					expect(stdErrLines[0]).to.not.equal('');
 					done();
 				});
 			});

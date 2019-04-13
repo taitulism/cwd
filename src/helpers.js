@@ -43,8 +43,8 @@ const getLogMsg = {
 				? ` ${args[0]} `
 				: `
 					\r\t\t${args.join('\n\t\t')}
-					\r\t    `;
-
+					\r\t    `
+		;
 
 		return `\n
 			\r  Cwd.${method}(cmd): Command not found

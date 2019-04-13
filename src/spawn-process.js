@@ -71,7 +71,16 @@ module.exports = function spawnProcess (cmdStr, ...rest) {
         registerLinesEvent(childProc, 'stdout', 'stdOut', 'hasData');
 
     if (childProc.stderr)
-        registerLinesEvent(childProc, 'stderr', 'stdErr', 'hasErrors');
+		registerLinesEvent(childProc, 'stderr', 'stdErr', 'hasErrors');
+
+	childProc.on('close', () => {
+		if (childProc.stdout.lineBuffer) {
+			childProc.emit('stdOut', [childProc.stdout.lineBuffer]);
+		}
+		if (childProc.stderr.lineBuffer) {
+			childProc.emit('stdErr', [childProc.stderr.lineBuffer]);
+		}
+	})
 
     return childProc;
 }
@@ -82,15 +91,22 @@ function registerLinesEvent (proc, channel, eventName, flagName) {
         proc[flagName] = true;
     });
 
-    let lineBuffer = '';
+    proc[channel].lineBuffer = '';
     proc[channel].setEncoding('utf8').on('data', (chunk) => {
-        lineBuffer += chunk;
+        proc[channel].lineBuffer += chunk;
 
-        const lines = lineBuffer.split('\n');
-        const lastLine = lines.pop();
+		const lines = proc[channel].lineBuffer
+			.split('\n')
+			.map( line => line.trim())
+			.filter( line => line !== '')
+		;
 
-        proc.emit(eventName, lines.filter(line => line != ''));
+		if (lines.length > 0) {
+			const lastLine = lines.pop();
 
-        lineBuffer = lastLine;
+			proc[channel].lineBuffer = lastLine;
+		}
+
+        lines.length && proc.emit(eventName, lines);
     });
 };
