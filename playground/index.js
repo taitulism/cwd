@@ -10,7 +10,7 @@ const cwd = createCwd(DIR);
 
 (async () => {
 	// const answer = await runCounter(process.cwd());
-	exec('ls', (err, out, er) => {
+	execFile('ls', (err, out, er) => {
 
 	})
 

@@ -60,6 +60,55 @@ module.exports = () => {
 		});
 	});
 
+	describe('Channels max buffer (default: 200 * 1024 bytes)', () => {
+		let cwdInstance;
+		beforeEach(() => { cwdInstance = createCwd('./tests/helper-processes') });
+		afterEach(() => { cwdInstance = null });
+
+		// const maxStrSizeAllowed = 170660;
+		const maxStrSizeAllowed = 186180;
+
+		it('throws when exceeded', async () => {
+			try {
+				await cwdInstance.runCmd('node max-buffer-out.js', [maxStrSizeAllowed + 1]);
+
+				expect(false).to.be.true;
+			}
+			catch (ex) {
+				expect(ex.message).to.have.string('buffer size exceeded');
+			}
+
+			try {
+				await cwdInstance.runCmd('node max-buffer-err.js', [maxStrSizeAllowed + 1]);
+
+				expect(false).to.be.true;
+			}
+			catch (ex) {
+				expect(ex.message).to.have.string('buffer size exceeded');
+			}
+		});
+
+		it('doesn\'t throw when NOT exceeded', async() => {
+			try {
+				const [,out] = await cwdInstance.runCmd('node max-buffer-out.js', [maxStrSizeAllowed]);
+
+				expect(out).to.be.ok;
+			}
+			catch (ex) {
+				expect(true).to.be.false;
+			}
+
+			try {
+				const [,,err] = await cwdInstance.runCmd('node max-buffer-err.js', [maxStrSizeAllowed]);
+
+				expect(err).to.be.ok;
+			}
+			catch (ex) {
+				expect(true).to.be.false;
+			}
+		});
+	});
+
 	describe('When called without arguments', () => {
 		it('rejects with an error', () => {
 			const shouldReject = () => {
