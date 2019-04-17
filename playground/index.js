@@ -7,14 +7,23 @@ const DIR = __dirname;
 const cwd = createCwd(DIR);
 
 
+async function getFiles () {
+	const [isOk, stdout, stderr] = await cwd.runCmd('ls');
+
+	if (isOk)
+		return stdout.split('\n');
+	else
+		return stderr;
+}
 
 (async () => {
-	// const answer = await runCounter(process.cwd());
-	execFile('ls', (err, out, er) => {
-
+	const p = await getFiles().then((res) => {
+		console.log(res);
 	})
 
-	console.log('Did You Get It? -', answer);
+	setTimeout(() => {
+
+	}, 3000);
 
 
 
