@@ -1,16 +1,16 @@
 const chai = require('chai');
-const expect = chai.expect;
-const chaiAsPromised = require("chai-as-promised");
+const {expect} = chai;
+const chaiAsPromised = require('chai-as-promised');
 
 chai.use(chaiAsPromised);
 
-const { TEST_DIR } = require('./constants');
+const {TEST_DIR} = require('./constants');
 const createCwd = require('../');
 
 describe('\r===========\n-  C W D  -\n===========', () => {
 	describe('Creation', require('./creation'));
 
-    describe('Instance', () => {
+	describe('Instance', () => {
 		describe('API / Reference', () => {
 			const cwdInstance = createCwd(TEST_DIR);
 
@@ -24,5 +24,5 @@ describe('\r===========\n-  C W D  -\n===========', () => {
 		});
 
 		describe('Usage', require('./Usage'));
-    });
+	});
 });

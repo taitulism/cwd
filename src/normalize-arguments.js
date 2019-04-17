@@ -1,7 +1,10 @@
+/* eslint-disable max-statements */
+
+const errTitle = 'Cwd.spawnProcess() -';
 
 module.exports = function normalizeArgs (maybeArgs, maybeOptions) {
 	if (!maybeArgs) {
-		return [[], {}]
+		return [[], {}];
 	}
 
 	if (maybeOptions) {
@@ -15,10 +18,10 @@ module.exports = function normalizeArgs (maybeArgs, maybeOptions) {
 
 		// Bad Args
 		if (!isArray(maybeArgs)) {
-			throw new Error('Cwd.spawnProcess() - Command arguments must be an array');
+			throw new Error(`${errTitle} Command arguments must be an array`);
 		}
 		if (!isObject(maybeOptions)) {
-			throw new Error('Cwd.spawnProcess() - Spawn options must be an object');
+			throw new Error(`${errTitle} Spawn options must be an object`);
 		}
 	}
 
@@ -31,15 +34,17 @@ module.exports = function normalizeArgs (maybeArgs, maybeOptions) {
 		return [[], maybeArgs];
 	}
 
-	throw new Error(`Cwd.spawnProcess() - Expecting an array or an object. Got: ${maybeArgs}`);
+	const errMsg = `${errTitle} Expecting an array or an object. Got: ${maybeArgs}`;
+
+	throw new Error(errMsg);
+};
+
+
+
+function isArray (thing) {
+	return Array.isArray(thing);
 }
 
-
-
-function isArray (x) {
-    return Array.isArray(x);
-}
-
-function isObject (x) {
-    return Object.prototype.toString.call(x) === '[object Object]';
+function isObject (thing) {
+	return Object.prototype.toString.call(thing) === '[object Object]';
 }

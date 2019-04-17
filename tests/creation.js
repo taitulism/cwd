@@ -1,6 +1,6 @@
-const { expect } = require('chai');
+const {expect} = require('chai');
 
-const { TEST_DIR } = require('./constants');
+const {TEST_DIR} = require('./constants');
 const createCwd = require('../');
 const CwdClass = require('../src/Cwd');
 
@@ -16,8 +16,9 @@ module.exports = () => {
 	describe('When called with no params', () => {
 		it('it throws an error', () => {
 			const shouldThrow = () => createCwd();
+			const errMsg = 'Expecting one argument <String>, a directory path';
 
-			expect(shouldThrow).to.throw('Expecting one argument <String>, a directory path');
+			expect(shouldThrow).to.throw(errMsg);
 		});
 	});
 
@@ -35,9 +36,11 @@ module.exports = () => {
 			const shouldThrow2 = () => createCwd('');
 			const shouldThrow3 = () => createCwd(' ');
 
-			expect(shouldThrow1).to.throw('Expecting one argument <String>, a directory path');
-			expect(shouldThrow2).to.throw('Expecting one argument <String>, a directory path');
-			expect(shouldThrow3).to.throw('Expecting one argument <String>, a directory path');
+			const errMsg = 'Expecting one argument <String>, a directory path';
+
+			expect(shouldThrow1).to.throw(errMsg);
+			expect(shouldThrow2).to.throw(errMsg);
+			expect(shouldThrow3).to.throw(errMsg);
 		});
 	});
 };

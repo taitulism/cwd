@@ -1,53 +1,60 @@
-const { expect } = require('chai');
+const {expect} = require('chai');
 
-const { TEST_DIR } = require('../constants');
+const {TEST_DIR} = require('../constants');
 const createCwd = require('../..');
 
 module.exports = () => {
 	let cwdInstance;
-	beforeEach(() => { cwdInstance = createCwd(TEST_DIR) })
-	afterEach(() => { cwdInstance = null })
+
+	beforeEach(() => {
+		cwdInstance = createCwd(TEST_DIR);
+	});
+
+	afterEach(() => {
+		cwdInstance = null;
+	});
 
 	describe('When command is legit (e.g. `ls`)', () => {
 		it('returns a native child_process', async () => {
 			const returnValue = await cwdInstance.spawnProcess('ls');
+			const constructorName = Object.getPrototypeOf(returnValue).constructor.name;
 
 			expect(returnValue).to.be.an('object');
-			expect(Object.getPrototypeOf(returnValue).constructor.name).to.equal('ChildProcess');
+			expect(constructorName).to.equal('ChildProcess');
 		});
 
 		describe('Event: stdOut', () => {
 			it('event data is an array of strings (lines)', (done) => {
-				const p = cwdInstance.spawnProcess('ls');
+				const childProc = cwdInstance.spawnProcess('ls');
 
 				let lines;
 
-				p.on('stdOut', (linesAry) => {
+				childProc.on('stdOut', (linesAry) => {
 					lines = linesAry;
 				});
 
-				p.on('close', () => {
+				childProc.on('close', () => {
 					expect(lines).to.be.an('array');
 					expect(lines[0]).to.be.a('string');
 					done();
-				})
+				});
 			});
 
 			it('holds the stdout text', (done) => {
-				const p = cwdInstance.spawnProcess('ls');
+				const childProc = cwdInstance.spawnProcess('ls');
 
 				let stdoutBuffer = '';
 				let stdOutLineBuffer = '';
 
-				p.stdout.on('data', (chunk) => {
+				childProc.stdout.on('data', (chunk) => {
 					stdoutBuffer += chunk;
 				});
 
-				p.on('stdOut', (lines) => {
-					stdOutLineBuffer += lines.join('\n') + '\n';
+				childProc.on('stdOut', (lines) => {
+					stdOutLineBuffer += `${lines.join('\n')}\n`;
 				});
 
-				p.on('close', () => {
+				childProc.on('close', () => {
 					// remove last newLine added above
 					stdOutLineBuffer = stdOutLineBuffer.trimRight();
 
@@ -58,20 +65,20 @@ module.exports = () => {
 			});
 
 			it('filters out empty lines', (done) => {
-				const p = cwdInstance.spawnProcess('ls');
+				const childProc = cwdInstance.spawnProcess('ls');
 
 				let stdoutBuffer = '';
 				let stdOutLines = [];
 
-				p.stdout.on('data', (chunk) => {
+				childProc.stdout.on('data', (chunk) => {
 					stdoutBuffer += chunk;
 				});
 
-				p.on('stdOut', (lines) => {
+				childProc.on('stdOut', (lines) => {
 					stdOutLines = stdOutLines.concat(lines);
 				});
 
-				p.on('close', () => {
+				childProc.on('close', () => {
 					const stdoutBufferLines = stdoutBuffer.split('\n');
 
 					expect(stdoutBufferLines).to.have.lengthOf(6);
@@ -86,37 +93,37 @@ module.exports = () => {
 
 		describe('Event: stdErr', () => {
 			it('event data is an array of strings (lines)', (done) => {
-				const p = cwdInstance.spawnProcess('ls ./bla');
+				const childProc = cwdInstance.spawnProcess('ls ./bla');
 
 				let lines;
 
-				p.on('stdErr', (linesAry) => {
+				childProc.on('stdErr', (linesAry) => {
 					lines = linesAry;
 				});
 
-				p.on('close', () => {
+				childProc.on('close', () => {
 					expect(lines).to.be.an('array');
 					expect(lines[0]).to.be.a('string');
 					done();
-				})
+				});
 			});
 
 			it('holds the stderr text', (done) => {
-				const p = cwdInstance.spawnProcess('ls ./bla');
+				const childProc = cwdInstance.spawnProcess('ls ./bla');
 
 				let stderrBuffer = '';
 				let stdErrLineBuffer = '';
 
-				p.stderr.on('data', (chunk) => {
+				childProc.stderr.on('data', (chunk) => {
 					stderrBuffer += chunk;
 				});
 
-				p.on('stdErr', (lines) => {
-					stdErrLineBuffer += '\n' + lines.join('\n');
+				childProc.on('stdErr', (lines) => {
+					stdErrLineBuffer += `\n${lines.join('\n')}`;
 					stdErrLineBuffer = stdErrLineBuffer.trim();
 				});
 
-				p.on('close', () => {
+				childProc.on('close', () => {
 					expect(stderrBuffer).to.have.string(stdErrLineBuffer);
 					expect(stderrBuffer).to.not.equal(stdErrLineBuffer);
 					done();
@@ -124,20 +131,20 @@ module.exports = () => {
 			});
 
 			it('filters out empty lines', (done) => {
-				const p = cwdInstance.spawnProcess('ls ./bla');
+				const childProc = cwdInstance.spawnProcess('ls ./bla');
 
 				let stderrBuffer = '';
 				let stdErrLines = [];
 
-				p.stderr.on('data', (chunk) => {
+				childProc.stderr.on('data', (chunk) => {
 					stderrBuffer += chunk;
 				});
 
-				p.on('stdErr', (lines) => {
+				childProc.on('stdErr', (lines) => {
 					stdErrLines = stdErrLines.concat(lines);
 				});
 
-				p.on('close', () => {
+				childProc.on('close', () => {
 					const stdoutBufferLines = stderrBuffer.split('\n');
 
 					expect(stdoutBufferLines).to.have.lengthOf(2);
@@ -153,11 +160,9 @@ module.exports = () => {
 
 	describe('When called without arguments', () => {
 		it('throws an error', () => {
-			const shouldThrow = () => {
-				return cwdInstance.spawnProcess();
-			};
+			const shouldThrow = () => cwdInstance.spawnProcess();
 
-			expect(shouldThrow).to.throw('First argument (cmd) must be a string')
+			expect(shouldThrow).to.throw('First argument (cmd) must be a string');
 		});
 	});
 

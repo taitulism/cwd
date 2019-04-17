@@ -1,13 +1,14 @@
-const { spawn } = require('child_process');
+const {spawn} = require('child_process');
 const normalizeArgs = require('./normalize-arguments');
-const { validateCommand } = require('./helpers');
+const {validateCommand} = require('./helpers');
 
 // const { isBadCmd, getBadCmdLogMsg, isBadDirectory } = require('./helpers');
 
-function parseCmd (cmdStr) {
-	cmdStr = cmdStr.trim();
+function parseCmd (rawCmdStr) {
+	const cmdStr = rawCmdStr.trim();
 
-	let needShell = false,
+	let cmd = cmdStr,
+		needShell = false,
 		cmdArgs = [];
 
 	if (hasSpaces(cmdStr) || containsShellOperators(cmdStr)) {
@@ -16,20 +17,20 @@ function parseCmd (cmdStr) {
 		if (hasSpaces(cmdStr)) {
 			const cmdSplit = cmdStr.split(' ');
 
-			cmdStr = cmdSplit.shift();
+			cmd = cmdSplit.shift();
 			cmdArgs = cmdSplit;
 		}
 	}
 
-	return [cmdStr, cmdArgs, needShell];
+	return [cmd, cmdArgs, needShell];
 }
 
 function hasSpaces (str) {
-    return /\s/.test(str);
+	return (/\s/u).test(str);
 }
 
 function containsShellOperators (str) {
-    return /[|&>;]/.test(str);
+	return (/[|&>;]/u).test(str);
 }
 
 
@@ -42,7 +43,7 @@ module.exports = function spawnProcess (cmdStr, ...rest) {
 
 	const finalArgs = cmdArgs.concat(argsAry);
 
-	if (options.shell == null) {
+	if (!options.shell) {
 		options.shell = needShell;
 	}
 
@@ -50,28 +51,25 @@ module.exports = function spawnProcess (cmdStr, ...rest) {
 
 	const childProc = spawn(cmd, finalArgs, options);
 
-    /* childProc.on('error', err => {
-        if (isBadCmd(cmd, err)) {
-            if (isBadDirectory(opts.cwd)) {
-	            const errMsg = getBadDirLogMsg('spawnProcess', opts.cwd);
-                const exception = new Error(errMsg);
-                throw exception;
-            }
+	/* A childProc.on('error', err => {
+		if (isBadCmd(cmd, err)) {
+			if (isBadDirectory(opts.cwd)) {
+				const errMsg = getBadDirLogMsg('spawnProcess', opts.cwd);
+				const exception = new Error(errMsg);
+				throw exception;
+			}
 
-            const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
-            const exception = new Error(errMsg);
+			const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
+			const exception = new Error(errMsg);
 
-            throw exception;
-        }
+			throw exception;
+		}
 
-        throw err;
-    }); */
+		throw err;
+	}); */
 
-    if (childProc.stdout)
-        registerLinesEvent(childProc, 'stdout', 'stdOut', 'hasData');
-
-    if (childProc.stderr)
-		registerLinesEvent(childProc, 'stderr', 'stdErr', 'hasErrors');
+	childProc.stdout && registerLinesEvent(childProc, 'stdout', 'stdOut', 'hasData');
+	childProc.stderr && registerLinesEvent(childProc, 'stderr', 'stdErr', 'hasErrors');
 
 	childProc.on('close', () => {
 		if (childProc.stdout.lineBuffer) {
@@ -80,25 +78,26 @@ module.exports = function spawnProcess (cmdStr, ...rest) {
 		if (childProc.stderr.lineBuffer) {
 			childProc.emit('stdErr', [childProc.stderr.lineBuffer]);
 		}
-	})
+	});
 
-    return childProc;
-}
+	return childProc;
+};
 
 function registerLinesEvent (proc, channel, eventName, flagName) {
-    proc[flagName] = false;
-    proc[channel].once('data', (chunk) => {
-        proc[flagName] = true;
-    });
+	proc[flagName] = false;
+	proc[channel].once('data', () => {
+		proc[flagName] = true;
+	});
 
-    proc[channel].lineBuffer = '';
-    proc[channel].setEncoding('utf8').on('data', (chunk) => {
-        proc[channel].lineBuffer += chunk;
+	proc[channel].lineBuffer = '';
+	proc[channel].setEncoding('utf8').on('data', (chunk) => {
+		proc[channel].lineBuffer += chunk;
 
+		/* eslint-disable-next-line newline-after-var */
 		const lines = proc[channel].lineBuffer
 			.split('\n')
-			.map( line => line.trim())
-			.filter( line => line !== '')
+			.map(line => line.trim())
+			.filter(line => line !== '')
 		;
 
 		if (lines.length > 0) {
@@ -107,6 +106,6 @@ function registerLinesEvent (proc, channel, eventName, flagName) {
 			proc[channel].lineBuffer = lastLine;
 		}
 
-        lines.length && proc.emit(eventName, lines);
-    });
-};
+		lines.length && proc.emit(eventName, lines);
+	});
+}

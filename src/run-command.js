@@ -1,12 +1,19 @@
+/* eslint-disable max-lines-per-function */
+
 module.exports = function runCmd (cmdStr, ...rest) {
+	// eslint-disable-next-line consistent-return
 	return new Promise((resolve, reject) => {
-		let ex = null;
+		let exception = null;
+
+		// eslint-disable-next-line no-magic-numbers
 		const maxBuffer = 200 * 1024;
 
 		let childProc;
+
 		try {
 			childProc = this.spawnProcess(cmdStr, ...rest);
-		} catch (ex) {
+		}
+		catch (ex) {
 			return reject(ex);
 		}
 
@@ -16,44 +23,49 @@ module.exports = function runCmd (cmdStr, ...rest) {
 		});
 
 		let stdOutBufferSize = 0;
+
 		childProc.stdout.on('data', (chunk) => {
-			chunkSize = Buffer.byteLength(chunk, 'utf8');
+			const chunkSize = Buffer.byteLength(chunk, 'utf8');
+
 			stdOutBufferSize += chunkSize;
 
 			if (stdOutBufferSize > maxBuffer) {
-				ex = new Error('Cwd.runCmd(): Max buffer size exceeded [stdout].')
+				exception = new Error('Cwd.runCmd(): Max buffer size exceeded [stdout].');
 
 				childProc.kill();
 			}
 		});
 
 		let stdErrBufferSize = 0;
+
 		childProc.stderr.on('data', (chunk) => {
-			chunkSize = Buffer.byteLength(chunk, 'utf8');
+			const chunkSize = Buffer.byteLength(chunk, 'utf8');
+
 			stdErrBufferSize += chunkSize;
 
 			if (stdErrBufferSize > maxBuffer) {
-				ex = new Error('Cwd.runCmd(): Max buffer size exceeded [stderr].')
+				exception = new Error('Cwd.runCmd(): Max buffer size exceeded [stderr].');
 				childProc.kill();
 			}
 		});
 
-		let stdoutLines = [];
+		const stdoutLines = [];
+
 		childProc.on('stdOut', (lines) => {
 			stdoutLines.push(...lines);
 		});
 
-		let stderrLines = [];
+		const stderrLines = [];
+
 		childProc.on('stdErr', (lines) => {
 			stderrLines.push(...lines);
 		});
 
 		childProc.on('close', (code) => {
-			if (ex) return reject(ex);
+			if (exception) return reject(exception);
 
 			const stdout = stdoutLines.join('\n');
 			const stderr = stderrLines.join('\n');
-
 
 			return resolve([code === 0, stdout, stderr]);
 		});

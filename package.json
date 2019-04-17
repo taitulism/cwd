@@ -5,7 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"tdd": "mocha ./tests --watch",
-		"test": "mocha"
+		"test": "mocha",
+		"lint": "eslint ./src ./tests"
 	},
 	"repository": {
 		"type": "git",
@@ -20,6 +21,7 @@
 	"devDependencies": {
 		"chai": "^4.2.0",
 		"chai-as-promised": "^7.1.1",
+		"eslint": "^5.16.0",
 		"mocha": "^5.2.0",
 		"sinon": "^6.3.4"
 	}
