@@ -11,7 +11,7 @@ module.exports = function runCmd (cmdStr, ...rest) {
 		let childProc;
 
 		try {
-			childProc = this.spawnProcess(cmdStr, ...rest);
+			childProc = this.spawn(cmdStr, ...rest);
 		}
 		catch (ex) {
 			return reject(ex);

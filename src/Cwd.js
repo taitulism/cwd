@@ -1,6 +1,6 @@
 const {existsSync} = require('fs');
 
-const spawnProcess = require('./spawn-process');
+const spawn = require('./spawn-process');
 const runCmd = require('./run-command');
 
 function Cwd (dirPath) {
@@ -20,6 +20,6 @@ module.exports = Cwd;
 Cwd.prototype = {
 	constructor: Cwd,
 
-	spawnProcess,
+	spawn,
 	runCmd,
 };

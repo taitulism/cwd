@@ -16,7 +16,7 @@ module.exports = () => {
 
 	describe('When command is legit (e.g. `ls`)', () => {
 		it('returns a native child_process', async () => {
-			const returnValue = await cwdInstance.spawnProcess('ls');
+			const returnValue = await cwdInstance.spawn('ls');
 			const constructorName = Object.getPrototypeOf(returnValue).constructor.name;
 
 			expect(returnValue).to.be.an('object');
@@ -25,7 +25,7 @@ module.exports = () => {
 
 		describe('Event: stdOut', () => {
 			it('event data is an array of strings (lines)', (done) => {
-				const childProc = cwdInstance.spawnProcess('ls');
+				const childProc = cwdInstance.spawn('ls');
 
 				let lines;
 
@@ -41,7 +41,7 @@ module.exports = () => {
 			});
 
 			it('holds the stdout text', (done) => {
-				const childProc = cwdInstance.spawnProcess('ls');
+				const childProc = cwdInstance.spawn('ls');
 
 				let stdoutBuffer = '';
 				let stdOutLineBuffer = '';
@@ -65,7 +65,7 @@ module.exports = () => {
 			});
 
 			it('filters out empty lines', (done) => {
-				const childProc = cwdInstance.spawnProcess('ls');
+				const childProc = cwdInstance.spawn('ls');
 
 				let stdoutBuffer = '';
 				let stdOutLines = [];
@@ -93,7 +93,7 @@ module.exports = () => {
 
 		describe('Event: stdErr', () => {
 			it('event data is an array of strings (lines)', (done) => {
-				const childProc = cwdInstance.spawnProcess('ls ./bla');
+				const childProc = cwdInstance.spawn('ls ./bla');
 
 				let lines;
 
@@ -109,7 +109,7 @@ module.exports = () => {
 			});
 
 			it('holds the stderr text', (done) => {
-				const childProc = cwdInstance.spawnProcess('ls ./bla');
+				const childProc = cwdInstance.spawn('ls ./bla');
 
 				let stderrBuffer = '';
 				let stdErrLineBuffer = '';
@@ -131,7 +131,7 @@ module.exports = () => {
 			});
 
 			it('filters out empty lines', (done) => {
-				const childProc = cwdInstance.spawnProcess('ls ./bla');
+				const childProc = cwdInstance.spawn('ls ./bla');
 
 				let stderrBuffer = '';
 				let stdErrLines = [];
@@ -160,7 +160,7 @@ module.exports = () => {
 
 	describe('When called without arguments', () => {
 		it('throws an error', () => {
-			const shouldThrow = () => cwdInstance.spawnProcess();
+			const shouldThrow = () => cwdInstance.spawn();
 
 			expect(shouldThrow).to.throw('First argument (cmd) must be a string');
 		});
@@ -168,7 +168,7 @@ module.exports = () => {
 
 	describe('When called with a command that doesn\'t exist (e.g. `bla`)', () => {
 		it('emits an error event', (done) => {
-			cwdInstance.spawnProcess('bla').on('error', (err) => {
+			cwdInstance.spawn('bla').on('error', (err) => {
 				expect(err).to.be.an.instanceof(Error);
 				expect(err.message).to.have.string('bla ENOENT');
 				done();

@@ -1,4 +1,4 @@
-const {spawn} = require('child_process');
+const {spawn: _spawn} = require('child_process');
 const normalizeArgs = require('./normalize-arguments');
 const {validateCommand} = require('./helpers');
 
@@ -34,7 +34,7 @@ function containsShellOperators (str) {
 }
 
 
-module.exports = function spawnProcess (cmdStr, ...rest) {
+module.exports = function spawn (cmdStr, ...rest) {
 	validateCommand(cmdStr);
 
 	const [cmd, cmdArgs, needShell] = parseCmd(cmdStr);
@@ -49,7 +49,7 @@ module.exports = function spawnProcess (cmdStr, ...rest) {
 
 	options.cwd = options.cwd || this.dirPath;
 
-	const childProc = spawn(cmd, finalArgs, options);
+	const childProc = _spawn(cmd, finalArgs, options);
 
 	/* A childProc.on('error', err => {
 		if (isBadCmd(cmd, err)) {

@@ -14,8 +14,8 @@ describe('\r===========\n-  C W D  -\n===========', () => {
 		describe('API / Reference', () => {
 			const cwdInstance = createCwd(TEST_DIR);
 
-			it('.spawnProcess(cmd, args, opts)', () => {
-				expect(cwdInstance.spawnProcess).to.be.a('function');
+			it('.spawn(cmd, args, opts)', () => {
+				expect(cwdInstance.spawn).to.be.a('function');
 			});
 
 			it('.runCmd(cmd, args, opts)', () => {

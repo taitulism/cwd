@@ -1,6 +1,6 @@
 /* eslint-disable max-statements */
 
-const errTitle = 'Cwd.spawnProcess() -';
+const errTitle = 'Cwd.spawn() -';
 
 module.exports = function normalizeArgs (maybeArgs, maybeOptions) {
 	if (!maybeArgs) {

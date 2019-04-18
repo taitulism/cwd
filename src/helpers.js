@@ -15,7 +15,7 @@ const getLogMsg = {
 			\r      Dir: ${cwd}
 		`;
 	},
-	emptyCmd (method = 'spawnProcess') {
+	emptyCmd (method = 'spawn') {
 		return `Cwd.${method}() - First argument (cmd) must be a string.`;
 	},
 	badCmd (method, cmd, args, opts) {
