@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const { spawn, exec, execFile } = require('child_process');
 
 const createCwd = require('..');

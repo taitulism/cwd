@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 let count = 10;
 
 process.stdout.write('a-process FIRST line\n')
