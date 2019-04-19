@@ -18,7 +18,9 @@
 	"scripts": {
 		"tdd": "mocha ./tests --watch",
 		"test": "mocha ./tests",
-		"lint": "eslint ./src ./tests"
+		"lint": "eslint ./src ./tests",
+		"preversion": "npm run lint && npm test",
+		"postversion": "git push && git push --tags"
 	},
 	"repository": {
 		"type": "git",
