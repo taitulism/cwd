@@ -17,7 +17,7 @@
 	"main": "index.js",
 	"scripts": {
 		"tdd": "mocha ./tests --watch",
-		"test": "mocha",
+		"test": "mocha ./tests",
 		"lint": "eslint ./src ./tests"
 	},
 	"repository": {
