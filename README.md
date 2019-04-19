@@ -1,5 +1,7 @@
 run-in-cwd
 ==========
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.org/taitulism/cwd.svg?branch=master)](https://travis-ci.org/taitulism/cwdgit )
 A wrapper around Node's `child_process.spawn()`.
 
 ## Get Started
