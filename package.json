@@ -1,5 +1,5 @@
 {
-	"name": "cwd",
+	"name": "run-in-cwd",
 	"version": "0.0.1",
 	"description": "A wrapper for Node's `child_process` module",
 	"main": "index.js",
