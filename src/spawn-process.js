@@ -97,7 +97,8 @@ function registerLinesEvent (proc, channel, eventName, flagName) {
 		const lines = proc[channel].lineBuffer
 			.split('\n')
 			.map(line => line.trim())
-			.filter(line => line !== '')
+			// TODO:
+			// .filter(line => line !== '')
 		;
 
 		if (lines.length > 0) {
