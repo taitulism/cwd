@@ -72,10 +72,10 @@ module.exports = function spawn (cmdStr, ...rest) {
 	childProc.stderr && registerLinesEvent(childProc, 'stderr', 'stdErr', 'hasErrors');
 
 	childProc.on('close', () => {
-		if (childProc.stdout.lineBuffer) {
+		if (childProc.stdout && childProc.stdout.lineBuffer) {
 			childProc.emit('stdOut', [childProc.stdout.lineBuffer]);
 		}
-		if (childProc.stderr.lineBuffer) {
+		if (childProc.stderr && childProc.stderr.lineBuffer) {
 			childProc.emit('stdErr', [childProc.stderr.lineBuffer]);
 		}
 	});
