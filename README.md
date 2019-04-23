@@ -48,7 +48,7 @@ The result is an array with 3 items:
 2. **`stdout`** - String - The process `stdout` string (utf-8 encoded)
 3. **`stderr`** - String - The process `stderr` string (utf-8 encoded)
 
->Both `stdout` & `stderr` strings are buffered and has a max limit of ~204 KB.  
+>Both `stdout` & `stderr` strings are buffered and has a max limit of ~ 5MB.  
 `runCmd()` will throw an exception when max size is exceeded.
 
 **Examples:**  
