@@ -101,7 +101,7 @@ module.exports = () => {
 			catch (ex) {
 				expect(ex.message).to.have.string('buffer size exceeded');
 			}
-		}).timeout(5000);
+		}).timeout(10000);
 
 		it('doesn\'t throw when NOT exceeded', async () => {
 			try {
@@ -123,7 +123,7 @@ module.exports = () => {
 			catch (ex) {
 				expect(true).to.be.false;
 			}
-		}).timeout(5000);
+		}).timeout(10000);
 	});
 
 	describe('When called without arguments', () => {

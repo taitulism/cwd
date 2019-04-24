@@ -64,7 +64,7 @@ module.exports = () => {
 				});
 			});
 
-			it.only('filters out empty lines', (done) => {
+			it('filters out empty lines', (done) => {
 				const childProc = cwdInstance.spawn('ls');
 
 				let stdoutBuffer = '';
