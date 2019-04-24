@@ -51,61 +51,77 @@ module.exports = function spawn (cmdStr, ...rest) {
 
 	const childProc = _spawn(cmd, finalArgs, options);
 
-	/* A childProc.on('error', err => {
-		if (isBadCmd(cmd, err)) {
+	childProc.on('error', (/* err */) => {
+		beforeClose(childProc);
+
+		/* if (isBadCmd(cmd, err)) {
 			if (isBadDirectory(opts.cwd)) {
 				const errMsg = getBadDirLogMsg('spawnProcess', opts.cwd);
 				const exception = new Error(errMsg);
-				throw exception;
+				childProc.emit('badDir');
 			}
 
 			const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
 			const exception = new Error(errMsg);
 
-			throw exception;
-		}
-
-		throw err;
-	}); */
+			childProc.emit('badCmd');
+		} */
+	});
 
 	childProc.stdout && registerLinesEvent(childProc, 'stdout', 'stdOut', 'hasData');
 	childProc.stderr && registerLinesEvent(childProc, 'stderr', 'stdErr', 'hasErrors');
 
 	childProc.on('close', () => {
-		if (childProc.stdout.lineBuffer) {
-			childProc.emit('stdOut', [childProc.stdout.lineBuffer]);
-		}
-		if (childProc.stderr.lineBuffer) {
-			childProc.emit('stdErr', [childProc.stderr.lineBuffer]);
-		}
+		emitLastLines(childProc);
 	});
 
 	return childProc;
 };
 
-function registerLinesEvent (proc, channel, eventName, flagName) {
-	proc[flagName] = false;
-	proc[channel].once('data', () => {
-		proc[flagName] = true;
+function registerLinesEvent (childProc, channel, eventName, flagName) {
+	childProc[flagName] = false;
+	childProc[channel].once('data', () => {
+		childProc[flagName] = true;
 	});
 
-	proc[channel].lineBuffer = '';
-	proc[channel].setEncoding('utf8').on('data', (chunk) => {
-		proc[channel].lineBuffer += chunk;
+	childProc[channel].lineBuffer = '';
+	childProc[channel].setEncoding('utf8').on('data', (chunk) => {
+		childProc[channel].lineBuffer += chunk;
 
 		/* eslint-disable-next-line newline-after-var */
-		const lines = proc[channel].lineBuffer
+		const lines = childProc[channel].lineBuffer
 			.split('\n')
 			.map(line => line.trim())
-			.filter(line => line !== '')
+			// TODO:
+			// .filter(line => line !== '')
 		;
 
 		if (lines.length > 0) {
 			const lastLine = lines.pop();
 
-			proc[channel].lineBuffer = lastLine;
+			childProc[channel].lineBuffer = lastLine;
 		}
 
-		lines.length && proc.emit(eventName, lines);
+		lines.length && childProc.emit(eventName, lines);
 	});
+}
+
+function beforeClose (childProc) {
+	destroyChannels(childProc);
+	emitLastLines(childProc);
+}
+
+function destroyChannels (childProc) {
+	childProc.stdout && childProc.stdout.destroy();
+	childProc.stderr && childProc.stderr.destroy();
+}
+
+function emitLastLines (childProc) {
+	if (childProc.stdout && childProc.stdout.lineBuffer) {
+		childProc.emit('stdOut', [childProc.stdout.lineBuffer]);
+	}
+
+	if (childProc.stderr && childProc.stderr.lineBuffer) {
+		childProc.emit('stdErr', [childProc.stderr.lineBuffer]);
+	}
 }

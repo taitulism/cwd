@@ -68,24 +68,25 @@ module.exports = () => {
 				const childProc = cwdInstance.spawn('ls');
 
 				let stdoutBuffer = '';
-				let stdOutLines = [];
 
 				childProc.stdout.on('data', (chunk) => {
 					stdoutBuffer += chunk;
 				});
+
+				let stdOutLines = [];
 
 				childProc.on('stdOut', (lines) => {
 					stdOutLines = stdOutLines.concat(lines);
 				});
 
 				childProc.on('close', () => {
-					const stdoutBufferLines = stdoutBuffer.split('\n');
+					const bufferLines = stdoutBuffer.split('\n');
 
-					expect(stdoutBufferLines).to.have.lengthOf(6);
-					expect(stdoutBufferLines[5]).to.equal('');
+					expect(bufferLines).to.have.lengthOf(7);
+					expect(bufferLines[6]).to.equal('');
 
-					expect(stdOutLines).to.have.lengthOf(5);
-					expect(stdOutLines[4]).to.not.equal('');
+					expect(stdOutLines).to.have.lengthOf(6);
+					expect(stdOutLines[5]).to.not.equal('');
 					done();
 				});
 			});

@@ -1,6 +1,6 @@
 {
 	"name": "run-in-cwd",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "A wrapper for Node's `child_process` module",
 	"keywords": [
 		"spawn",

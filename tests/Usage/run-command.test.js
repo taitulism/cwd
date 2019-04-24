@@ -66,7 +66,7 @@ module.exports = () => {
 		});
 	});
 
-	describe('Channels max buffer (default: 200 * 1024 bytes)', () => {
+	describe('Channels max buffer (default: ~5MB)', () => {
 		let cwd;
 
 		beforeEach(() => {
@@ -77,8 +77,7 @@ module.exports = () => {
 			cwd = null;
 		});
 
-		// const maxStrSizeAllowed = 170660;
-		const maxStrSizeAllowed = 186180;
+		const maxStrSizeAllowed = 4766250;
 
 		it('throws when exceeded', async () => {
 			try {
@@ -102,7 +101,7 @@ module.exports = () => {
 			catch (ex) {
 				expect(ex.message).to.have.string('buffer size exceeded');
 			}
-		});
+		}).timeout(10000);
 
 		it('doesn\'t throw when NOT exceeded', async () => {
 			try {
@@ -124,7 +123,7 @@ module.exports = () => {
 			catch (ex) {
 				expect(true).to.be.false;
 			}
-		});
+		}).timeout(10000);
 	});
 
 	describe('When called without arguments', () => {

@@ -6,7 +6,7 @@ module.exports = function runCmd (cmdStr, ...rest) {
 		let exception = null;
 
 		// eslint-disable-next-line no-magic-numbers
-		const maxBuffer = 200 * 1024;
+		const maxBuffer = 1024 * 1024 * 5; // ~5MB
 
 		let childProc;
 
