@@ -8,11 +8,4 @@ module.exports = {
 
 		return str;
 	},
-
-	forLoop (num, callback) {
-		for (let i = 0; i < num; i++) {
-			/* eslint-disable-next-line callback-return */
-			callback(i);
-		}
-	},
 };
