@@ -1,6 +1,7 @@
 const {existsSync} = require('fs');
 
-const spawn = require('./spawn-process');
+const spawn = require('./spawn');
+const spawnShell = require('./spawn-shell');
 const runCmd = require('./run-command');
 
 function Cwd (dirPath) {
@@ -21,5 +22,6 @@ Cwd.prototype = {
 	constructor: Cwd,
 
 	spawn,
+	spawnShell,
 	runCmd,
 };

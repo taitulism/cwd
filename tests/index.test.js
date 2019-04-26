@@ -18,6 +18,10 @@ describe('\r===========\n-  C W D  -\n===========', () => {
 				expect(cwdInstance.spawn).to.be.a('function');
 			});
 
+			it('.spawnShell(cmd, args, opts)', () => {
+				expect(cwdInstance.spawnShell).to.be.a('function');
+			});
+
 			it('.runCmd(cmd, args, opts)', () => {
 				expect(cwdInstance.runCmd).to.be.a('function');
 			});
