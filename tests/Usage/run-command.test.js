@@ -46,7 +46,9 @@ module.exports = () => {
 				it('is the command output', async () => {
 					const [, returnValue] = await cwdInstance.runCmd('ls');
 
-					expect(returnValue.includes('Cwd.js')).to.be.true;
+					expect(returnValue.includes('aaa')).to.be.true;
+					expect(returnValue.includes('bbb')).to.be.true;
+					expect(returnValue.includes('ccc')).to.be.true;
 				});
 			});
 
