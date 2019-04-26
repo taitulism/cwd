@@ -81,8 +81,8 @@ module.exports = function spawn (cmdStr, ...rest) {
 
 
 function beforeClose (childProc) {
-	destroyChannels(childProc);
 	emitLastLines(childProc);
+	destroyChannels(childProc);
 }
 
 function destroyChannels (childProc) {
