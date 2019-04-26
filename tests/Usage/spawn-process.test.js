@@ -82,11 +82,11 @@ module.exports = () => {
 				childProc.on('close', () => {
 					const bufferLines = stdoutBuffer.split('\n');
 
-					expect(bufferLines).to.have.lengthOf(7);
-					expect(bufferLines[6]).to.equal('');
+					expect(bufferLines).to.have.lengthOf(8);
+					expect(bufferLines[7]).to.equal('');
 
-					expect(stdOutLines).to.have.lengthOf(6);
-					expect(stdOutLines[5]).to.not.equal('');
+					expect(stdOutLines).to.have.lengthOf(7);
+					expect(stdOutLines[6]).to.not.equal('');
 					done();
 				});
 			});

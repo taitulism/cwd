@@ -1,6 +1,7 @@
 const {spawn: _spawn} = require('child_process');
 const normalizeArgs = require('./normalize-arguments');
 const {validateCommand} = require('./helpers');
+const registerLineEvents = require('./register-line-events');
 
 // const { isBadCmd, getBadCmdLogMsg, isBadDirectory } = require('./helpers');
 
@@ -68,8 +69,7 @@ module.exports = function spawn (cmdStr, ...rest) {
 		} */
 	});
 
-	childProc.stdout && registerLinesEvent(childProc, 'stdout', 'stdOut', 'hasData');
-	childProc.stderr && registerLinesEvent(childProc, 'stderr', 'stdErr', 'hasErrors');
+	registerLineEvents(childProc);
 
 	childProc.on('close', () => {
 		emitLastLines(childProc);
@@ -78,33 +78,7 @@ module.exports = function spawn (cmdStr, ...rest) {
 	return childProc;
 };
 
-function registerLinesEvent (childProc, channel, eventName, flagName) {
-	childProc[flagName] = false;
-	childProc[channel].once('data', () => {
-		childProc[flagName] = true;
-	});
 
-	childProc[channel].lineBuffer = '';
-	childProc[channel].setEncoding('utf8').on('data', (chunk) => {
-		childProc[channel].lineBuffer += chunk;
-
-		/* eslint-disable-next-line newline-after-var */
-		const lines = childProc[channel].lineBuffer
-			.split('\n')
-			.map(line => line.trim())
-			// TODO:
-			// .filter(line => line !== '')
-		;
-
-		if (lines.length > 0) {
-			const lastLine = lines.pop();
-
-			childProc[channel].lineBuffer = lastLine;
-		}
-
-		lines.length && childProc.emit(eventName, lines);
-	});
-}
 
 function beforeClose (childProc) {
 	destroyChannels(childProc);
