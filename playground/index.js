@@ -10,7 +10,7 @@ const cwd = createCwd(DIR);
 
 
 async function getFiles () {
-	const [isOk, stdout, stderr] = await cwd.runCmd('ls');
+	const [isOk, stdout, stderr] = await cwd.runCmd(`node ../tests/helper-processes/max-buffer-err.js`, [1024*1024*5]);
 
 	if (isOk)
 		return stdout.split('\n');
