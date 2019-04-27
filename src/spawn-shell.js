@@ -1,8 +1,7 @@
-const {spawn: _spawn} = require('child_process');
+const baseSpawn = require('./base-spawn');
 const normalizeArgs = require('./normalize-arguments');
 const {validateCommand} = require('./helpers');
 const parseCmd = require('./parse-command');
-const childProc = require('./child-proc');
 
 module.exports = function spawnShell (cmdStr, ...rest) {
 	validateCommand(cmdStr);
@@ -20,30 +19,5 @@ module.exports = function spawnShell (cmdStr, ...rest) {
 	options.cwd = options.cwd || this.dirPath;
 	options.shell = options.shell || true;
 
-	const cp = _spawn(cmd, finalArgs, options);
-
-	cp.on('error', (/* err */) => {
-		childProc.beforeClose(cp);
-
-		/* if (isBadCmd(cmd, err)) {
-			if (isBadDirectory(opts.cwd)) {
-				const errMsg = getBadDirLogMsg('spawnProcess', opts.cwd);
-				const exception = new Error(errMsg);
-				cp.emit('badDir');
-			}
-
-			const errMsg = getBadCmdLogMsg(cmd, cmdArgs, opts);
-			const exception = new Error(errMsg);
-
-			cp.emit('badCmd');
-		} */
-	});
-
-	childProc.registerLineEvents(cp);
-
-	cp.on('close', () => {
-		childProc.emitLastLines(cp);
-	});
-
-	return cp;
+	return baseSpawn(cmd, finalArgs, options);
 };
