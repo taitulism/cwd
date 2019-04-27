@@ -1,9 +1,9 @@
 const {spawn} = require('child_process');
-const childProc = require('./child-proc');
+const childProc = require('./private-methods/child-proc');
 
 // const { isBadCmd, getBadCmdLogMsg, isBadDirectory } = require('./helpers');
 
-module.exports = function _spawn (cmd, cmdArgs, options) {
+module.exports = function baseSpawn (cmd, cmdArgs, options) {
 	const cp = spawn(cmd, cmdArgs, options);
 
 	cp.on('error', (/* err */) => {

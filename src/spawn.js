@@ -1,7 +1,7 @@
 const baseSpawn = require('./base-spawn');
-const normalizeArgs = require('./normalize-arguments');
-const {validateCommand} = require('./helpers');
-const parseCmd = require('./parse-command');
+const normalizeArgs = require('./private-methods/normalize-arguments');
+const {validateCommand} = require('./private-methods/helpers');
+const parseCmd = require('./private-methods/parse-command');
 
 module.exports = function spawn (cmdStr, ...rest) {
 	validateCommand(cmdStr);
