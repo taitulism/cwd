@@ -1,28 +1,19 @@
-module.exports = function parseCmd (rawCmdStr) {
-	const cmdStr = rawCmdStr.trim();
+module.exports = function parseCmd (rawCmd, rawCmdArgs) {
+	const cmdStr = rawCmd.trim();
 
 	let cmd = cmdStr,
-		needShell = false,
-		cmdArgs = [];
+		cmdArgs = rawCmdArgs;
 
-	if (hasSpaces(cmdStr) || containsShellOperators(cmdStr)) {
-		needShell = true;
+	const hasSpaces = (/\s/u).test(rawCmd);
+	const containsShellOperators = (/[|&>;]/u).test(rawCmd);
+	const needShell = hasSpaces || containsShellOperators;
 
-		if (hasSpaces(cmdStr)) {
-			const cmdSplit = cmdStr.split(' ');
+	if (hasSpaces) {
+		const cmdSplit = rawCmd.split(' ');
 
-			cmd = cmdSplit.shift();
-			cmdArgs = cmdSplit;
-		}
+		cmd = cmdSplit.shift();
+		cmdArgs = cmdSplit.concat(rawCmdArgs);
 	}
 
 	return [cmd, cmdArgs, needShell];
 };
-
-function hasSpaces (str) {
-	return (/\s/u).test(str);
-}
-
-function containsShellOperators (str) {
-	return (/[|&>;]/u).test(str);
-}

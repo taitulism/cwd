@@ -3,11 +3,11 @@
 const errTitle = 'Cwd.spawn() -';
 
 module.exports = function normalizeArgs (maybeArgs, maybeOptions) {
-	if (!maybeArgs) {
-		return [[], {}];
-	}
+	// neither
+	if (!maybeArgs && !maybeOptions) return [[], {}];
 
-	if (maybeOptions) {
+	// both
+	if (maybeArgs && maybeOptions) {
 		if (isArray(maybeArgs) && isObject(maybeOptions)) {
 			return [maybeArgs, maybeOptions];
 		}
@@ -16,27 +16,33 @@ module.exports = function normalizeArgs (maybeArgs, maybeOptions) {
 			return [maybeOptions, maybeArgs];
 		}
 
-		// Bad Args
-		if (!isArray(maybeArgs)) {
-			throw new Error(`${errTitle} Command arguments must be an array`);
+		const errMsg = getLogMsg.expectedTypes(maybeArgs, maybeOptions);
+
+		throw new Error(errMsg);
+	}
+
+	const cmdArgs = [];
+	const options = {};
+
+	// only one
+	if (maybeArgs) {
+		if (isArray(maybeArgs)) {
+			cmdArgs.push(...maybeArgs);
 		}
-		if (!isObject(maybeOptions)) {
-			throw new Error(`${errTitle} Spawn options must be an object`);
+		else if (isObject(maybeArgs)) {
+			Object.assign(options, maybeArgs);
+		}
+	}
+	else if (maybeOptions) {
+		if (isArray(maybeOptions)) {
+			cmdArgs.push(...maybeOptions);
+		}
+		else if (isObject(maybeOptions)) {
+			Object.assign(options, maybeOptions);
 		}
 	}
 
-	// only 1 argument
-	if (isArray(maybeArgs)) {
-		return [maybeArgs, {}];
-	}
-
-	if (isObject(maybeArgs)) {
-		return [[], maybeArgs];
-	}
-
-	const errMsg = `${errTitle} Expecting an array or an object. Got: ${maybeArgs}`;
-
-	throw new Error(errMsg);
+	return [cmdArgs, options];
 };
 
 

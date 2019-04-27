@@ -16,6 +16,16 @@ module.exports = {
 	emptyCmd (method = 'spawn') {
 		return `Cwd.${method}() - First argument (cmd) must be a string.`;
 	},
+	expectedTypes (maybeArgs, maybeOptions) {
+		let errMsg = 'Expecting an `arguments` array and/or an `options` object.';
+
+		const typeofArgs = typeof maybeArgs;
+		const typeofOpts = typeof maybeOptions;
+
+		errMsg += ` Got ${typeofArgs} and ${typeofOpts}`;
+
+		return errMsg;
+	},
 	badCmd (method, cmd, args, opts) {
 		const argsLen = args.length;
 
