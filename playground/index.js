@@ -23,7 +23,7 @@ try {
 
 
 	// const cp = spawn('ls &&', ['echo hiiii', '&& echo bye'], {shell:true})
-	const cp = cwd.spawn('ls &&', ['echo hiiii', '&& echo bye'])
+	const cp = cwd.spawn('ls ', ['./'])
 
 	cp.on('stdOut', (lines) => {
 		lines.forEach((line) => {

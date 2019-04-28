@@ -4,10 +4,10 @@ module.exports = function parseCmd (rawCmd, rawCmdArgs) {
 	let cmd = cmdStr,
 		cmdArgs = rawCmdArgs;
 
-	const hasSpaces = (/\s/u).test(rawCmd);
+	const hasSpaces = (/\s/u).test(cmdStr);
 
 	if (hasSpaces) {
-		const cmdSplit = rawCmd.split(' ');
+		const cmdSplit = cmdStr.split(' ');
 
 		cmd = cmdSplit.shift();
 		cmdArgs = cmdSplit.concat(rawCmdArgs);
