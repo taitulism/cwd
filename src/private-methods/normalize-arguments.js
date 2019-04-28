@@ -1,6 +1,6 @@
 /* eslint-disable max-statements */
 
-const errTitle = 'Cwd.spawn() -';
+const getLogMsg = require('./get-log-msg');
 
 module.exports = function normalizeArgs (maybeArgs, maybeOptions) {
 	// neither
