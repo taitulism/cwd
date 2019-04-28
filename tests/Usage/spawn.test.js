@@ -1,4 +1,5 @@
 const {expect} = require('chai');
+const sinon = require('sinon');
 
 const {TEST_DIR} = require('../constants');
 const createCwd = require('../..');
@@ -155,6 +156,40 @@ module.exports = () => {
 					expect(stdErrLines[0]).to.not.equal('');
 					done();
 				});
+			});
+		});
+	});
+
+	describe('When detected shell opertaors ("|", "&", ">", ";")', () => {
+		describe('Inside the command', () => {
+			it('automatically spawns a shell', (done) => {
+				const spy = sinon.spy(Object.getPrototypeOf(cwdInstance), '_spawn');
+
+				cwdInstance.spawn('ls && echo hi')
+					.on('close', () => {
+						expect(spy.callCount).to.equal(1);
+						expect(spy.firstCall.args).to.have.lengthOf(3);
+						expect(spy.firstCall.args[2]).to.be.an('object');
+						expect(spy.firstCall.args[2].shell).to.be.true;
+						spy.restore();
+						done();
+					});
+			});
+		});
+
+		describe('In on of the command\'s arguments', () => {
+			it('automatically spawns a shell', (done) => {
+				const spy = sinon.spy(Object.getPrototypeOf(cwdInstance), '_spawn');
+
+				cwdInstance.spawn('ls', ['&& echo hi'])
+					.on('close', () => {
+						expect(spy.callCount).to.equal(1);
+						expect(spy.firstCall.args).to.have.lengthOf(3);
+						expect(spy.firstCall.args[2]).to.be.an('object');
+						expect(spy.firstCall.args[2].shell).to.be.true;
+						spy.restore();
+						done();
+					});
 			});
 		});
 	});
