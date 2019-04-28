@@ -197,16 +197,12 @@ subDir.spawn('git', ['commit'])
 
 When you want to run a simple command with a simple argument like: `ls -l` you would normally either (1) pass a command string AND an array with a single argument or (2) add the `{shell: true}` spawn option.
 
-*`CWD` will spawn a process with a shell for you when it sees that space.*
-
 ```js
 const childProc = require('child_process')
 const cwd = require('run-in-cwd')
 
 // :(
 childProc.spawn('ls', ['-l'])
-
-// :(
 childProc.spawn('ls -l', {shell: true})
 
 // :D
