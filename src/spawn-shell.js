@@ -1,4 +1,3 @@
-const baseSpawn = require('./base-spawn');
 const resolveArgs = require('./private-methods/resolve-args');
 
 module.exports = function spawnShell (...args) {
@@ -7,5 +6,7 @@ module.exports = function spawnShell (...args) {
 	options.cwd = options.cwd || this.dirPath;
 	options.shell = options.shell || true;
 
-	return baseSpawn(cmd, cmdArgs, options);
+	const childProc = this._spawn(cmd, cmdArgs, options);
+
+	return childProc;
 };
