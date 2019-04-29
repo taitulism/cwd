@@ -22,11 +22,12 @@ A wrapper around Node's `child_process.spawn()`.
 
 &nbsp;
 
-&nbsp;
+
+
 
 ## Instance API
 
->**WARNING:** If you let your users pass in the command and/or any of its arguments - make sure they are safe and and don't forget to handle errors.
+>**WARNING:** If you let your users pass in the command and/or any of its arguments - make sure they are safe and don't forget to handle errors.
 
 ------------------------------------------------------------
 ### **.runCmd(** cmd, [args, [options] ] **)**
@@ -96,6 +97,9 @@ A running process has two output channels: one for regular output (`childProc.st
 
 &nbsp;
 
+
+
+
 ------------------------------------------------------------
 ### **.spawn(** cmd, [args, [options] ] **)**
 ------------------------------------------------------------
@@ -124,11 +128,20 @@ const cwd = require('run-in-cwd')('./path/to/dir')
 const childProc = cwd.spawn('ls')
 
 // With arguments
-const childProc = cwd.spawn('git status') // (spawns a shell)
+const childProc = cwd.spawn('git', ['status'])
 
 // you can also do:
-const childProc = cwd.spawn('git', ['status']) // (doesn't spawn a shell)
+const childProc = cwd.spawn('git status')
+
+// and also:
+const childProc = cwd.spawn('git add -A && git commit')
+// Shell signs like '|', '&', '>', ';' are used to automatically spawn with a shell.
 ```
+
+------------------------------------------------------------
+### **.spawnShell(** cmd, [args, [options] ] **)**
+------------------------------------------------------------
+Is the same as `.spawn()` but with the `{shell: true}` option.
 
 &nbsp;
 
@@ -170,6 +183,9 @@ childProc.on('close', (exitCode) => {
 
 &nbsp;
 
+
+
+
 --------------------------------
 `run-in-cwd` vs. `child_process`
 --------------------------------
@@ -185,7 +201,7 @@ childProc.spawn('git', ['status'], {cwd: './sub-dir'})
 childProc.spawn('git', ['add', '-A'], {cwd: './sub-dir'})
 childProc.spawn('git', ['commit'], {cwd: './sub-dir'})
 
-// run-in-dir
+// run-in-cwd
 const subDir = cwd('./sub-dir')
 
 subDir.spawn('git', ['status'])
@@ -197,20 +213,27 @@ subDir.spawn('git', ['commit'])
 
 When you want to run a simple command with a simple argument like: `ls -l` you would normally either (1) pass a command string AND an array with a single argument or (2) add the `{shell: true}` spawn option.
 
-*`CWD` will spawn a process with a shell for you when it sees that space.*
-
 ```js
 const childProc = require('child_process')
 const cwd = require('run-in-cwd')
 
 // :(
 childProc.spawn('ls', ['-l'])
-
-// :(
 childProc.spawn('ls -l', {shell: true})
-
+```
+With `run-in-cwd` you simply do it like:
+```js
 // :D
 cwd.spawn('ls -l')
+```
+The whole command string is split by spaces and then transformed into:
+```js
+.spawn('ls', ['-l'])
+```
+
+If you need a shell - use `spawnShell` instead of `spawn`:
+```js
+cwd.spawnShell('ls -l')
 ```
 
 What is CWD?

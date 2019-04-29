@@ -46,7 +46,9 @@ module.exports = () => {
 				it('is the command output', async () => {
 					const [, returnValue] = await cwdInstance.runCmd('ls');
 
-					expect(returnValue.includes('Cwd.js')).to.be.true;
+					expect(returnValue.includes('aaa')).to.be.true;
+					expect(returnValue.includes('bbb')).to.be.true;
+					expect(returnValue.includes('ccc')).to.be.true;
 				});
 			});
 
@@ -77,36 +79,12 @@ module.exports = () => {
 			cwd = null;
 		});
 
-		const maxStrSizeAllowed = 4766250;
-
-		it('throws when exceeded', async () => {
-			try {
-				const file = 'max-buffer-out.js';
-
-				await cwd.runCmd(`node ${file}`, [maxStrSizeAllowed + 1]);
-
-				expect(false).to.be.true;
-			}
-			catch (ex) {
-				expect(ex.message).to.have.string('buffer size exceeded');
-			}
-
-			try {
-				const file = 'max-buffer-err.js';
-
-				await cwd.runCmd(`node ${file}`, [maxStrSizeAllowed + 1]);
-
-				expect(false).to.be.true;
-			}
-			catch (ex) {
-				expect(ex.message).to.have.string('buffer size exceeded');
-			}
-		}).timeout(10000);
+		const FIVE_MEGABYTES = 1024 * 1024 * 5;
 
 		it('doesn\'t throw when NOT exceeded', async () => {
 			try {
 				const file = 'max-buffer-out.js';
-				const [, out] = await cwd.runCmd(`node ${file}`, [maxStrSizeAllowed]);
+				const [, out] = await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES]);
 
 				expect(out).to.be.ok;
 			}
@@ -116,14 +94,38 @@ module.exports = () => {
 
 			try {
 				const file = 'max-buffer-err.js';
-				const [,, err] = await cwd.runCmd(`node ${file}`, [maxStrSizeAllowed]);
+				const [,, err] = await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES]);
 
 				expect(err).to.be.ok;
 			}
 			catch (ex) {
 				expect(true).to.be.false;
 			}
-		}).timeout(10000);
+		}).timeout(5000);
+
+		it('throws when exceeded', async () => {
+			try {
+				const file = 'max-buffer-out.js';
+
+				await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES + 1]);
+
+				expect(false).to.be.true;
+			}
+			catch (ex) {
+				expect(ex.message).to.have.string('buffer size exceeded');
+			}
+
+			try {
+				const file = 'max-buffer-err.js';
+
+				await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES + 1]);
+
+				expect(false).to.be.true;
+			}
+			catch (ex) {
+				expect(ex.message).to.have.string('buffer size exceeded');
+			}
+		}).timeout(5000);
 	});
 
 	describe('When called without arguments', () => {

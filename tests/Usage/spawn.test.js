@@ -1,6 +1,7 @@
 const {expect} = require('chai');
+const sinon = require('sinon');
 
-const {TEST_DIR} = require('../constants');
+const {TEST_DIR, OTHER_TEST_DIR} = require('../constants');
 const createCwd = require('../..');
 
 module.exports = () => {
@@ -82,11 +83,11 @@ module.exports = () => {
 				childProc.on('close', () => {
 					const bufferLines = stdoutBuffer.split('\n');
 
-					expect(bufferLines).to.have.lengthOf(7);
-					expect(bufferLines[6]).to.equal('');
+					expect(bufferLines).to.have.lengthOf(4);
+					expect(bufferLines[3]).to.equal('');
 
-					expect(stdOutLines).to.have.lengthOf(6);
-					expect(stdOutLines[5]).to.not.equal('');
+					expect(stdOutLines).to.have.lengthOf(3);
+					expect(stdOutLines[2]).to.not.equal('');
 					done();
 				});
 			});
@@ -156,6 +157,87 @@ module.exports = () => {
 					done();
 				});
 			});
+		});
+	});
+
+	describe('When detected shell opertaors ("|", "&", ">", ";")', () => {
+		describe('Inside the command', () => {
+			it('automatically spawns a shell', (done) => {
+				const spy = sinon.spy(Object.getPrototypeOf(cwdInstance), '_spawn');
+
+				cwdInstance.spawn('ls && echo hi')
+					.on('close', () => {
+						expect(spy.callCount).to.equal(1);
+						expect(spy.firstCall.args).to.have.lengthOf(3);
+						expect(spy.firstCall.args[2]).to.be.an('object');
+						expect(spy.firstCall.args[2].shell).to.be.true;
+						spy.restore();
+						done();
+					});
+			});
+		});
+
+		describe('In on of the command\'s arguments', () => {
+			it('automatically spawns a shell', (done) => {
+				const spy = sinon.spy(Object.getPrototypeOf(cwdInstance), '_spawn');
+
+				cwdInstance.spawn('ls', ['&& echo hi'])
+					.on('close', () => {
+						expect(spy.callCount).to.equal(1);
+						expect(spy.firstCall.args).to.have.lengthOf(3);
+						expect(spy.firstCall.args[2]).to.be.an('object');
+						expect(spy.firstCall.args[2].shell).to.be.true;
+						spy.restore();
+						done();
+					});
+			});
+		});
+	});
+
+	describe('When called with spawn options', () => {
+		it('overrides default cwd', (done) => {
+			let bufferedLines = [];
+
+			cwdInstance.spawn('ls', {cwd: OTHER_TEST_DIR})
+				.on('stdOut', (lines) => {
+					bufferedLines = bufferedLines.concat(lines);
+				})
+				.on('close', () => {
+					expect(bufferedLines).to.include('other-aaa');
+					expect(bufferedLines).to.include('other-bbb');
+					expect(bufferedLines).to.include('other-ccc');
+					done();
+				});
+		});
+
+		it('overrides default cwd (with cmd args)', (done) => {
+			let bufferedLines = [];
+
+			cwdInstance.spawn('ls', ['./'], {cwd: OTHER_TEST_DIR})
+				.on('stdOut', (lines) => {
+					bufferedLines = bufferedLines.concat(lines);
+				})
+				.on('close', () => {
+					expect(bufferedLines).to.include('other-aaa');
+					expect(bufferedLines).to.include('other-bbb');
+					expect(bufferedLines).to.include('other-ccc');
+					done();
+				});
+		});
+
+		it('overrides default cwd (with `null` as cmd args)', (done) => {
+			let bufferedLines = [];
+
+			cwdInstance.spawn('ls', null, {cwd: OTHER_TEST_DIR})
+				.on('stdOut', (lines) => {
+					bufferedLines = bufferedLines.concat(lines);
+				})
+				.on('close', () => {
+					expect(bufferedLines).to.include('other-aaa');
+					expect(bufferedLines).to.include('other-bbb');
+					expect(bufferedLines).to.include('other-ccc');
+					done();
+				});
 		});
 	});
 

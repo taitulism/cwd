@@ -1,9 +1,12 @@
-const {forLoop, getString} = require('./common');
+const {getString} = require('./common');
 
-const targetSize = process.argv[2] || 200 * 1024; // 204800
+/* eslint-disable-next-line prefer-destructuring */
+const targetSize = process.argv[2];
 
-forLoop(targetSize / 10, () => {
-	const str = `${getString(10)}\n`;
+if (!targetSize) {
+	throw new Error('max-buffer-out needs a target size argument');
+}
 
-	process.stdout.write(str);
-});
+const str = getString(targetSize);
+
+process.stdout.write(str);

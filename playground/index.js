@@ -10,7 +10,7 @@ const cwd = createCwd(DIR);
 
 
 async function getFiles () {
-	const [isOk, stdout, stderr] = await cwd.runCmd('ls');
+	const [isOk, stdout, stderr] = await cwd.runCmd(`node ../tests/helper-processes/max-buffer-err.js`, [1024*1024*5]);
 
 	if (isOk)
 		return stdout.split('\n');
@@ -19,17 +19,47 @@ async function getFiles () {
 }
 
 (async () => {
-	const p = await getFiles().then((res) => {
-		console.log(res);
+try {
+
+
+	// const cp = spawn('ls &&', ['echo hiiii', '&& echo bye'], {shell:true})
+	const cp = cwd.spawn('ls ', ['./'])
+
+	cp.on('stdOut', (lines) => {
+		lines.forEach((line) => {
+			console.log('LINE:', line);
+		})
+	})
+	// cp.stdout.on('data', (chunk) => {
+	// 	console.log('CHUNK:', chunk.toString());
+	// })
+	cp.on('close', (code) => {
+		console.log(code);
+	})
+	cp.on('error', (err) => {
+		console.log('ERROR:\n', err);
 	})
 
-	setTimeout(() => {
-
-	}, 3000);
-
-
+	console.log('file:', cp.spawnfile);
+	console.log('args:', cp.spawnargs);
+	console.log('');
 
 
+} catch (ex) {
+	console.log('EX:\n', ex);
+}
+
+
+
+	// const p = await getFiles().then((res) => {
+	// 	console.log(res);
+	// })
+
+
+
+
+
+	setTimeout(() => {}, 3000);
 })()
 
 
