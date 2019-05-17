@@ -1,22 +1,22 @@
 const {expect} = require('chai');
 
 const {TEST_DIR} = require('../constants');
-const createCwd = require('../..');
+const Cwd = require('../..');
 
 module.exports = () => {
-	let cwdInstance;
+	let cwd;
 
 	beforeEach(() => {
-		cwdInstance = createCwd(TEST_DIR);
+		cwd = new Cwd(TEST_DIR);
 	});
 
 	afterEach(() => {
-		cwdInstance = null;
+		cwd = null;
 	});
 
 	describe('When command is legit (e.g. `ls`)', () => {
 		it('returns an array', async () => {
-			const returnValue = await cwdInstance.runCmd('ls');
+			const returnValue = await cwd.runCmd('ls');
 
 			expect(returnValue).to.be.an('array');
 		});
@@ -24,13 +24,13 @@ module.exports = () => {
 		describe('Returned Array', () => {
 			describe('[0] isOk', () => {
 				it('is true when exit code is 0', async () => {
-					const [returnValue] = await cwdInstance.runCmd('ls');
+					const [returnValue] = await cwd.runCmd('ls');
 
 					expect(returnValue).to.be.true;
 				});
 
 				it('is false when exit code is NOT 0', async () => {
-					const [returnValue] = await cwdInstance.runCmd('ls', ['./bla']);
+					const [returnValue] = await cwd.runCmd('ls', ['./bla']);
 
 					expect(returnValue).to.be.false;
 				});
@@ -38,13 +38,13 @@ module.exports = () => {
 
 			describe('[1] process.stdout', () => {
 				it('is a string', async () => {
-					const [, returnValue] = await cwdInstance.runCmd('ls');
+					const [, returnValue] = await cwd.runCmd('ls');
 
 					expect(returnValue).to.be.a('string');
 				});
 
 				it('is the command output', async () => {
-					const [, returnValue] = await cwdInstance.runCmd('ls');
+					const [, returnValue] = await cwd.runCmd('ls');
 
 					expect(returnValue.includes('aaa')).to.be.true;
 					expect(returnValue.includes('bbb')).to.be.true;
@@ -54,13 +54,13 @@ module.exports = () => {
 
 			describe('[2] process.stderr', () => {
 				it('is a string', async () => {
-					const [, , returnValue] = await cwdInstance.runCmd('ls');
+					const [, , returnValue] = await cwd.runCmd('ls');
 
 					expect(returnValue).to.be.a('string');
 				});
 
 				it('is the command errors', async () => {
-					const [, , returnValue] = await cwdInstance.runCmd('ls', ['./bla']);
+					const [, , returnValue] = await cwd.runCmd('ls', ['./bla']);
 
 					expect(returnValue).to.have.string('No such file or directory');
 				});
@@ -72,7 +72,7 @@ module.exports = () => {
 		let cwd;
 
 		beforeEach(() => {
-			cwd = createCwd('./tests/helper-processes');
+			cwd = new Cwd('./tests/helper-processes');
 		});
 
 		afterEach(() => {
@@ -101,7 +101,7 @@ module.exports = () => {
 			catch (ex) {
 				expect(true).to.be.false;
 			}
-		}).timeout(5000);
+		}).slow(4500).timeout(10000);
 
 		it('throws when exceeded', async () => {
 			try {
@@ -125,13 +125,13 @@ module.exports = () => {
 			catch (ex) {
 				expect(ex.message).to.have.string('buffer size exceeded');
 			}
-		}).timeout(5000);
+		}).slow(4500).timeout(10000);
 	});
 
 	describe('When called without arguments', () => {
 		it('rejects with an error', () => {
 			const rejectionMsg = 'First argument (cmd) must be a string';
-			const shouldReject = () => cwdInstance.runCmd();
+			const shouldReject = () => cwd.runCmd();
 
 			expect(shouldReject()).to.be.rejectedWith(rejectionMsg);
 		});
@@ -139,7 +139,7 @@ module.exports = () => {
 
 	describe('When called with a command that doesn\'t exist (e.g. `bla`)', () => {
 		it('rejects with an error', () => {
-			const shouldReject = () => cwdInstance.runCmd('bla');
+			const shouldReject = () => cwd.runCmd('bla');
 
 			expect(shouldReject()).to.be.rejectedWith('bla ENOENT');
 		});

@@ -2,22 +2,22 @@ const {expect} = require('chai');
 const sinon = require('sinon');
 
 const {TEST_DIR, OTHER_TEST_DIR} = require('../constants');
-const createCwd = require('../..');
+const Cwd = require('../..');
 
 module.exports = () => {
-	let cwdInstance;
+	let cwd;
 
 	beforeEach(() => {
-		cwdInstance = createCwd(TEST_DIR);
+		cwd = new Cwd(TEST_DIR);
 	});
 
 	afterEach(() => {
-		cwdInstance = null;
+		cwd = null;
 	});
 
 	describe('When command is legit (e.g. `ls`)', () => {
 		it('returns a native child_process', async () => {
-			const returnValue = await cwdInstance.spawn('ls');
+			const returnValue = await cwd.spawn('ls');
 			const constructorName = Object.getPrototypeOf(returnValue).constructor.name;
 
 			expect(returnValue).to.be.an('object');
@@ -26,7 +26,7 @@ module.exports = () => {
 
 		describe('Event: stdOut', () => {
 			it('event data is an array of strings (lines)', (done) => {
-				const childProc = cwdInstance.spawn('ls');
+				const childProc = cwd.spawn('ls');
 
 				let lines;
 
@@ -42,7 +42,7 @@ module.exports = () => {
 			});
 
 			it('holds the stdout text', (done) => {
-				const childProc = cwdInstance.spawn('ls');
+				const childProc = cwd.spawn('ls');
 
 				let stdoutBuffer = '';
 				let stdOutLineBuffer = '';
@@ -66,7 +66,7 @@ module.exports = () => {
 			});
 
 			it('filters out empty lines', (done) => {
-				const childProc = cwdInstance.spawn('ls');
+				const childProc = cwd.spawn('ls');
 
 				let stdoutBuffer = '';
 
@@ -95,7 +95,7 @@ module.exports = () => {
 
 		describe('Event: stdErr', () => {
 			it('event data is an array of strings (lines)', (done) => {
-				const childProc = cwdInstance.spawn('ls ./bla');
+				const childProc = cwd.spawn('ls ./bla');
 
 				let lines;
 
@@ -111,7 +111,7 @@ module.exports = () => {
 			});
 
 			it('holds the stderr text', (done) => {
-				const childProc = cwdInstance.spawn('ls ./bla');
+				const childProc = cwd.spawn('ls ./bla');
 
 				let stderrBuffer = '';
 				let stdErrLineBuffer = '';
@@ -133,7 +133,7 @@ module.exports = () => {
 			});
 
 			it('filters out empty lines', (done) => {
-				const childProc = cwdInstance.spawn('ls ./bla');
+				const childProc = cwd.spawn('ls ./bla');
 
 				let stderrBuffer = '';
 				let stdErrLines = [];
@@ -163,9 +163,9 @@ module.exports = () => {
 	describe('When detected shell opertaors ("|", "&", ">", ";")', () => {
 		describe('Inside the command', () => {
 			it('automatically spawns a shell', (done) => {
-				const spy = sinon.spy(Object.getPrototypeOf(cwdInstance), '_spawn');
+				const spy = sinon.spy(Object.getPrototypeOf(cwd), '_spawn');
 
-				cwdInstance.spawn('ls && echo hi')
+				cwd.spawn('ls && echo hi')
 					.on('close', () => {
 						expect(spy.callCount).to.equal(1);
 						expect(spy.firstCall.args).to.have.lengthOf(3);
@@ -179,9 +179,9 @@ module.exports = () => {
 
 		describe('In on of the command\'s arguments', () => {
 			it('automatically spawns a shell', (done) => {
-				const spy = sinon.spy(Object.getPrototypeOf(cwdInstance), '_spawn');
+				const spy = sinon.spy(Object.getPrototypeOf(cwd), '_spawn');
 
-				cwdInstance.spawn('ls', ['&& echo hi'])
+				cwd.spawn('ls', ['&& echo hi'])
 					.on('close', () => {
 						expect(spy.callCount).to.equal(1);
 						expect(spy.firstCall.args).to.have.lengthOf(3);
@@ -198,7 +198,7 @@ module.exports = () => {
 		it('overrides default cwd', (done) => {
 			let bufferedLines = [];
 
-			cwdInstance.spawn('ls', {cwd: OTHER_TEST_DIR})
+			cwd.spawn('ls', {cwd: OTHER_TEST_DIR})
 				.on('stdOut', (lines) => {
 					bufferedLines = bufferedLines.concat(lines);
 				})
@@ -213,7 +213,7 @@ module.exports = () => {
 		it('overrides default cwd (with cmd args)', (done) => {
 			let bufferedLines = [];
 
-			cwdInstance.spawn('ls', ['./'], {cwd: OTHER_TEST_DIR})
+			cwd.spawn('ls', ['./'], {cwd: OTHER_TEST_DIR})
 				.on('stdOut', (lines) => {
 					bufferedLines = bufferedLines.concat(lines);
 				})
@@ -228,7 +228,7 @@ module.exports = () => {
 		it('overrides default cwd (with `null` as cmd args)', (done) => {
 			let bufferedLines = [];
 
-			cwdInstance.spawn('ls', null, {cwd: OTHER_TEST_DIR})
+			cwd.spawn('ls', null, {cwd: OTHER_TEST_DIR})
 				.on('stdOut', (lines) => {
 					bufferedLines = bufferedLines.concat(lines);
 				})
@@ -243,7 +243,7 @@ module.exports = () => {
 
 	describe('When called without arguments', () => {
 		it('throws an error', () => {
-			const shouldThrow = () => cwdInstance.spawn();
+			const shouldThrow = () => cwd.spawn();
 
 			expect(shouldThrow).to.throw('First argument (cmd) must be a string');
 		});
@@ -251,7 +251,7 @@ module.exports = () => {
 
 	describe('When called with a command that doesn\'t exist (e.g. `bla`)', () => {
 		it('emits an error event', (done) => {
-			cwdInstance.spawn('bla').on('error', (err) => {
+			cwd.spawn('bla').on('error', (err) => {
 				expect(err).to.be.an.instanceof(Error);
 				expect(err.message).to.have.string('bla ENOENT');
 				done();

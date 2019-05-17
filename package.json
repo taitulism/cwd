@@ -14,9 +14,9 @@
 		"run command",
 		"cmd"
 	],
-	"main": "index.js",
+	"main": "./index.js",
 	"scripts": {
-		"dev": "mocha ./tests --watch",
+		"dev": "mocha ./tests --bail --watch",
 		"test": "mocha ./tests",
 		"lint": "eslint ./src ./tests",
 		"preversion": "npm run lint && npm test",
