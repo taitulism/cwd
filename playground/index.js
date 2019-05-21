@@ -20,6 +20,15 @@ async function getFiles () {
 
 (async () => {
 try {
+	await execFile('echod hello', (err, out, warns) => {
+		console.log('err', err);
+		console.log('out', out);
+		console.log('warns', warns);
+	})
+
+	setTimeout(() => {}, 3000);
+
+	return;
 
 
 	// const cp = spawn('ls &&', ['echo hiiii', '&& echo bye'], {shell:true})
