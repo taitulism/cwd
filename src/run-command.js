@@ -1,13 +1,12 @@
 /* eslint-disable max-lines-per-function */
 
+// eslint-disable-next-line no-magic-numbers
+const maxBuffer = 1024 * 1024 * 5; // ~5MB
+
 module.exports = function runCmd (cmdStr, ...rest) {
 	// eslint-disable-next-line consistent-return
 	return new Promise((resolve, reject) => {
 		let exception = null;
-
-		// eslint-disable-next-line no-magic-numbers
-		const maxBuffer = 1024 * 1024 * 5; // ~5MB
-
 		let childProc;
 
 		try {

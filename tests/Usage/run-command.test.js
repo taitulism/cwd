@@ -46,9 +46,9 @@ module.exports = () => {
 				it('is the command output', async () => {
 					const [, returnValue] = await cwd.runCmd('ls');
 
-					expect(returnValue.includes('aaa')).to.be.true;
-					expect(returnValue.includes('bbb')).to.be.true;
-					expect(returnValue.includes('ccc')).to.be.true;
+					expect(returnValue).to.include('aaa')
+						.and.include('bbb')
+						.and.include('ccc')
 				});
 			});
 
@@ -68,7 +68,7 @@ module.exports = () => {
 		});
 	});
 
-	describe('Channels max buffer (default: ~5MB)', () => {
+	describe('Max buffer (default: ~5MB)', () => {
 		let cwd;
 
 		beforeEach(() => {
