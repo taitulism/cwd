@@ -4,6 +4,7 @@ const baseSpawn = require('./base-spawn');
 const spawn = require('./spawn');
 const spawnShell = require('./spawn-shell');
 const runCmd = require('./run-command');
+const runShellCmd = require('./run-shell-command');
 
 function Cwd (dirPath) {
 	if (typeof dirPath !== 'string' || dirPath.trim() === '') {
@@ -26,4 +27,5 @@ Cwd.prototype = {
 	spawn,
 	spawnShell,
 	runCmd,
+	runShellCmd,
 };

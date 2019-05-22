@@ -25,6 +25,10 @@ describe('\r===========\n-  C W D  -\n===========', () => {
 			it('.runCmd(cmd, args, opts)', () => {
 				expect(cwdInstance.runCmd).to.be.a('function');
 			});
+
+			it('.runShellCmd(cmd, args, opts)', () => {
+				expect(cwdInstance.runShellCmd).to.be.a('function');
+			});
 		});
 
 		describe('Usage', require('./Usage'));
