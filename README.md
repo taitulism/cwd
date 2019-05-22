@@ -134,8 +134,7 @@ const childProc = cwd.spawn('git', ['status'])
 const childProc = cwd.spawn('git status')
 
 // and also:
-const childProc = cwd.spawn('git add -A && git commit')
-// Shell signs like '|', '&', '>', ';' are used to automatically spawn with a shell.
+const childProc = cwd.spawnShell('git add -A && git commit')
 ```
 
 ------------------------------------------------------------

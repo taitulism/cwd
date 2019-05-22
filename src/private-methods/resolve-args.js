@@ -1,7 +1,4 @@
-/* eslint-disable max-statements */
-
 const normalizeArgs = require('./normalize-arguments');
-
 const getLogMsg = require('./get-log-msg');
 
 module.exports = function resolveArgs (cmd, maybeArgs, maybeOptions) {
