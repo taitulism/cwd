@@ -36,15 +36,29 @@ module.exports = () => {
 				});
 			});
 
-			describe('[1] process.stdout', () => {
+			describe('[1] process.stderr', () => {
 				it('is a string', async () => {
-					const [, returnValue] = await cwd.runCmd('ls');
+					const [, returnValue] = await cwd.runCmd('ls', ['./bla']);
+
+					expect(returnValue).to.be.a('string');
+				});
+
+				it('is the command errors', async () => {
+					const [, returnValue] = await cwd.runCmd('ls', ['./bla']);
+
+					expect(returnValue).to.have.string('No such file or directory');
+				});
+			});
+
+			describe('[2] process.stdout', () => {
+				it('is a string', async () => {
+					const [,, returnValue] = await cwd.runCmd('ls');
 
 					expect(returnValue).to.be.a('string');
 				});
 
 				it('is the command output', async () => {
-					const [, returnValue] = await cwd.runCmd('ls');
+					const [,, returnValue] = await cwd.runCmd('ls');
 
 					expect(returnValue).to.include('aaa')
 						.and.include('bbb')
@@ -52,17 +66,49 @@ module.exports = () => {
 				});
 			});
 
-			describe('[2] process.stderr', () => {
-				it('is a string', async () => {
-					const [, , returnValue] = await cwd.runCmd('ls');
+			describe('Other Props', () => {
+				describe('.exitCode', () => {
+					it('is a number', async () => {
+						const {exitCode} = await cwd.runCmd('ls');
 
-					expect(returnValue).to.be.a('string');
+						expect(exitCode).to.be.a('number');
+					});
+
+					it('equal 0 when everything is ok', async () => {
+						const {exitCode} = await cwd.runCmd('ls');
+
+						expect(exitCode).to.equal(0);
+					});
 				});
 
-				it('is the command errors', async () => {
-					const [, , returnValue] = await cwd.runCmd('ls', ['./bla']);
+				describe('.stderr', () => {
+					it('is a string', async () => {
+						const {stderr} = await cwd.runCmd('ls');
 
-					expect(returnValue).to.have.string('No such file or directory');
+						expect(stderr).to.be.a('string');
+					});
+
+					it('is the command errors', async () => {
+						const {stderr} = await cwd.runCmd('ls', ['./bla']);
+
+						expect(stderr).to.have.string('No such file or directory');
+					});
+				});
+
+				describe('.stdout', () => {
+					it('is a string', async () => {
+						const {stdout} = await cwd.runCmd('ls');
+
+						expect(stdout).to.be.a('string');
+					});
+
+					it('is the command output', async () => {
+						const {stdout} = await cwd.runCmd('ls');
+
+						expect(stdout).to.include('aaa')
+							.and.include('bbb')
+							.and.include('ccc')
+					});
 				});
 			});
 		});
@@ -84,7 +130,7 @@ module.exports = () => {
 		it('doesn\'t throw when NOT exceeded', async () => {
 			try {
 				const file = 'max-buffer-out.js';
-				const [, out] = await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES]);
+				const [,, out] = await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES]);
 
 				expect(out).to.be.ok;
 			}
@@ -94,7 +140,7 @@ module.exports = () => {
 
 			try {
 				const file = 'max-buffer-err.js';
-				const [,, err] = await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES]);
+				const [, err] = await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES]);
 
 				expect(err).to.be.ok;
 			}
