@@ -37,24 +37,24 @@ module.exports = () => {
 			});
 
 			describe('[1] process.stderr', () => {
-				it('is a string', async () => {
+				it('is an array', async () => {
 					const [, returnValue] = await cwd.runCmd('ls', ['./bla']);
 
-					expect(returnValue).to.be.a('string');
+					expect(returnValue).to.be.an('array');
 				});
 
 				it('is the command errors', async () => {
 					const [, returnValue] = await cwd.runCmd('ls', ['./bla']);
 
-					expect(returnValue).to.have.string('No such file or directory');
+					expect(returnValue[0]).to.have.string('No such file or directory');
 				});
 			});
 
 			describe('[2] process.stdout', () => {
-				it('is a string', async () => {
+				it('is an array', async () => {
 					const [,, returnValue] = await cwd.runCmd('ls');
 
-					expect(returnValue).to.be.a('string');
+					expect(returnValue).to.be.an('array');
 				});
 
 				it('is the command output', async () => {
