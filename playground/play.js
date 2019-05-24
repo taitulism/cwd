@@ -2,11 +2,11 @@
 
 const { spawn, exec, execFile } = require('child_process');
 
-const createCwd = require('..');
+const Cwd = require('..');
 
 const DIR = __dirname;
 
-const cwd = createCwd(DIR);
+const cwd = new Cwd(DIR);
 
 
 async function getFiles () {
@@ -26,9 +26,8 @@ try {
 		console.log('warns', warns);
 	})
 
-	setTimeout(() => {}, 5000);
-
 	return;
+
 
 
 	// const cp = spawn('ls &&', ['echo hiiii', '&& echo bye'], {shell:true})
@@ -43,17 +42,21 @@ try {
 	// 	console.log('CHUNK:', chunk.toString());
 	// })
 	cp.on('close', (code) => {
-		console.log(code);
+		console.log('closed', code);
 	})
 	cp.on('error', (err) => {
 		console.log('ERROR:\n', err);
 	})
+
+	// cp.kill()
 
 	console.log('file:', cp.spawnfile);
 	console.log('args:', cp.spawnargs);
 	console.log('');
 
 
+
+	setTimeout(() => {}, 5000);
 } catch (ex) {
 	console.log('EX:\n', ex);
 }
@@ -70,39 +73,3 @@ try {
 
 	setTimeout(() => {}, 3000);
 })()
-
-
-
-
-function runCounter () {
-    return new Promise((resolve, reject) => {
-        const p = cwd.spawn('node', ['a-process.js']);
-
-        let count = 0;
-        p.on('stdOut', (lines) => {
-			console.log('lines', lines);
-            // lines.forEach(line => {
-            //     if (line.startsWith('Count:')) {
-            //         count++;
-            //     }
-            // });
-        });
-
-        let errors = [];
-        p.on('stdErr', (lines) => {
-            errors = errors.concat(lines)
-        });
-
-        p.on('close', (code) => {
-            return resolve({errors, count})
-            if (p.hasErrors) {
-                console.log('p.stdErr', errors);
-                return resolve(false)
-            }
-
-            if (code === 0) {
-                return resolve(count)
-            }
-        });
-    });
-}
