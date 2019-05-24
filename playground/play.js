@@ -26,7 +26,7 @@ try {
 		console.log('warns', warns);
 	})
 
-	setTimeout(() => {}, 3000);
+	setTimeout(() => {}, 5000);
 
 	return;
 
