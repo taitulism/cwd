@@ -193,7 +193,7 @@ When you need to run multiple commands on the same directory and it's not your *
 *With `CWD` you only do it once.*
 ```js
 const childProc = require('child_process')
-const cwd = require('run-in-cwd')
+const Cwd = require('run-in-cwd')
 
 // Node's child process
 childProc.spawn('git', ['status'], {cwd: './sub-dir'})
@@ -201,7 +201,7 @@ childProc.spawn('git', ['add', '-A'], {cwd: './sub-dir'})
 childProc.spawn('git', ['commit'], {cwd: './sub-dir'})
 
 // run-in-cwd
-const subDir = cwd('./sub-dir')
+const subDir = new Cwd('./my-folder')
 
 subDir.spawn('git', ['status'])
 subDir.spawn('git', ['add', '-A'])
@@ -214,16 +214,18 @@ When you want to run a simple command with a simple argument like: `ls -l` you w
 
 ```js
 const childProc = require('child_process')
-const cwd = require('run-in-cwd')
 
 // :(
 childProc.spawn('ls', ['-l'])
 childProc.spawn('ls -l', {shell: true})
 ```
-With `run-in-cwd` you simply do it like:
+With `run-in-cwd` you do it like:
 ```js
+const Cwd = require('run-in-cwd')
+const cwd = new Cwd();
+
 // :D
-cwd.spawn('ls -l')
+cwd().spawn('ls -l')
 ```
 The whole command string is split by spaces and then transformed into:
 ```js
