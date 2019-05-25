@@ -17,7 +17,7 @@ module.exports = () => {
 
 	describe('When command is legit (e.g. `ls`)', () => {
 		it('spawns with a shell', (done) => {
-			const spy = sinon.spy(Object.getPrototypeOf(cwd), '_spawn');
+			const spy = sinon.spy(Object.getPrototypeOf(cwd), 'spawn');
 
 			cwd.spawnShell('ls').on('close', () => {
 				expect(spy.callCount).to.equal(1);

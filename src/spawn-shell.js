@@ -5,7 +5,7 @@ module.exports = function spawnShell (...args) {
 
 	options.shell = options.shell || true;
 
-	const childProc = this._spawn(cmd, cmdArgs, options);
+	const childProc = this.spawn(cmd, cmdArgs, options);
 
 	return childProc;
 };

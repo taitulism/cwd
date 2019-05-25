@@ -17,7 +17,7 @@ module.exports = () => {
 
 	describe('When command is legit (e.g. `ls`)', () => {
 		it('spawns with a shell', async () => {
-			const spy = sinon.spy(Object.getPrototypeOf(cwd), '_spawn');
+			const spy = sinon.spy(Object.getPrototypeOf(cwd), 'spawn');
 
 			try {
 				await cwd.runShellCmd('ls');

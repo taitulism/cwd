@@ -1,6 +1,5 @@
 const {existsSync} = require('fs');
 
-const baseSpawn = require('./base-spawn');
 const spawn = require('./spawn');
 const spawnShell = require('./spawn-shell');
 const runCmd = require('./run-command');
@@ -22,8 +21,6 @@ module.exports = Cwd;
 
 Cwd.prototype = {
 	constructor: Cwd,
-
-	_spawn: baseSpawn,
 	spawn,
 	spawnShell,
 	runCmd,
