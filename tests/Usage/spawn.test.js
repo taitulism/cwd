@@ -24,6 +24,88 @@ module.exports = () => {
 			expect(constructorName).to.equal('ChildProcess');
 		});
 
+		describe('Event: \'line/out\'', () => {
+			it('event data is a string (for each stdout single line)', (done) => {
+				const childProc = cwd.spawn('ls');
+				let count = 0;
+
+				childProc.on('line/out', (line) => {
+					count++;
+					expect(line).to.be.a('string');
+				});
+
+				childProc.on('close', () => {
+					expect(count).to.equal(3);
+					done();
+				});
+			});
+
+			it('holds an stdout single line of text', (done) => {
+				const childProc = cwd.spawn('ls');
+
+				let stdoutBuffer = '';
+				const lineOutArray = [];
+
+				childProc.stdout.on('data', (chunk) => {
+					stdoutBuffer += chunk;
+				});
+
+				childProc.on('line/out', (line) => {
+					lineOutArray.push(line);
+				});
+
+				childProc.on('close', () => {
+					lineOutArray.forEach((line) => {
+						expect(stdoutBuffer).to.have.string(line);
+					});
+
+					expect(stdoutBuffer.trimRight().split('\n')).to.eql(lineOutArray);
+					done();
+				});
+			});
+		});
+
+		describe('Event: \'line/err\'', () => {
+			it('event data is a string (for each stderr single line)', (done) => {
+				const childProc = cwd.spawn('ls', ['./bla']);
+				let count = 0;
+
+				childProc.on('line/err', (line) => {
+					count++;
+					expect(line).to.be.a('string');
+				});
+
+				childProc.on('close', () => {
+					expect(count).to.equal(1);
+					done();
+				});
+			});
+
+			it('holds an stderr single line of text', (done) => {
+				const childProc = cwd.spawn('ls', ['./bla']);
+
+				let stderrBuffer = '';
+				const lineErrArray = [];
+
+				childProc.stderr.on('data', (chunk) => {
+					stderrBuffer += chunk;
+				});
+
+				childProc.on('line/err', (line) => {
+					lineErrArray.push(line);
+				});
+
+				childProc.on('close', () => {
+					lineErrArray.forEach((line) => {
+						expect(stderrBuffer).to.have.string(line);
+					});
+
+					expect(stderrBuffer.trimRight().split('\n')).to.eql(lineErrArray);
+					done();
+				});
+			});
+		});
+
 		describe('Event: stdOut', () => {
 			it('event data is an array of strings (lines)', (done) => {
 				const childProc = cwd.spawn('ls');

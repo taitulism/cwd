@@ -20,12 +20,12 @@ module.exports = {
 	},
 
 	registerLineEvents (cp) {
-		cp.stdout && registerLineEvent(cp, 'stdout', 'stdOut', 'hasData');
-		cp.stderr && registerLineEvent(cp, 'stderr', 'stdErr', 'hasErrors');
+		cp.stdout && registerLineEvent(cp, 'stdout', 'stdOut', 'line/out', 'hasData');
+		cp.stderr && registerLineEvent(cp, 'stderr', 'stdErr', 'line/err', 'hasErrors');
 	},
 };
 
-function registerLineEvent (cp, channel, eventName, flagName) {
+function registerLineEvent (cp, channel, eventName, lineEventName, flagName) {
 	cp[flagName] = false;
 
 	cp[channel].once('data', () => {
@@ -51,6 +51,12 @@ function registerLineEvent (cp, channel, eventName, flagName) {
 			cp[channel].lineBuffer = lastLine;
 		}
 
-		lines.length && cp.emit(eventName, lines);
+		if (lines.length) {
+			lines.forEach((line) => {
+				cp.emit(lineEventName, line);
+			});
+
+			cp.emit(eventName, lines);
+		}
 	});
 }
