@@ -1,5 +1,5 @@
+const path = require('path');
 const {expect} = require('chai');
-const sinon = require('sinon');
 
 const {TEST_DIR, OTHER_TEST_DIR} = require('../constants');
 const Cwd = require('../..');
@@ -22,6 +22,49 @@ module.exports = () => {
 
 			expect(returnValue).to.be.an('object');
 			expect(constructorName).to.equal('ChildProcess');
+		});
+
+		describe('Event: line', () => {
+			it('event data is a string (for each stdout & stderr line)', (done) => {
+				const file = '../helper-processes/out-and-err.js';
+
+				const childProc = cwd.spawn(`node ${file}`);
+				let count = 0;
+
+				childProc.on('line', (line) => {
+					count++;
+					expect(line).to.be.a('string');
+				});
+
+				childProc.on('close', () => {
+					expect(count).to.equal(4);
+					done();
+				});
+			});
+
+			it('holds a single line of text from either stdout or stderr', (done) => {
+				const childProc = cwd.spawn('ls');
+
+				let stdoutBuffer = '';
+				const lineOutArray = [];
+
+				childProc.stdout.on('data', (chunk) => {
+					stdoutBuffer += chunk;
+				});
+
+				childProc.on('line', (line) => {
+					lineOutArray.push(line);
+				});
+
+				childProc.on('close', () => {
+					lineOutArray.forEach((line) => {
+						expect(stdoutBuffer).to.have.string(line);
+					});
+
+					expect(stdoutBuffer.trimRight().split('\n')).to.eql(lineOutArray);
+					done();
+				});
+			});
 		});
 
 		describe('Event: \'line/out\'', () => {
