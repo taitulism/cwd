@@ -1,4 +1,4 @@
-const path = require('path');
+const {EOL} = require('os');
 const {expect} = require('chai');
 
 const {TEST_DIR, OTHER_TEST_DIR} = require('../constants');
@@ -62,6 +62,51 @@ module.exports = () => {
 					});
 
 					expect(stdoutBuffer.trimRight().split('\n')).to.eql(lineOutArray);
+					done();
+				});
+			});
+
+			it('discards empty lines', (done) => {
+				const file = '../helper-processes/output-empty-lines.js';
+
+				const childProc = cwd.spawn(`node ${file}`);
+
+				let stdoutBuffer = '';
+				const lines = [];
+
+				childProc.stdout.on('data', (chunk) => {
+					stdoutBuffer += chunk;
+				});
+
+				childProc.on('line', (line) => {
+					lines.push(line);
+				});
+
+				childProc.on('close', () => {
+					// test the native stdout string for reference
+					const splitBuffer = stdoutBuffer.split(EOL);
+
+					expect(splitBuffer).to.have.lengthOf(8);
+
+					let EOLCount = 0;
+
+					splitBuffer.forEach((line) => {
+						!line && EOLCount++;
+					});
+
+					expect(EOLCount).to.equal(4);
+
+					// test lines
+					expect(lines).to.have.lengthOf(4);
+
+					EOLCount = 0;
+
+					lines.forEach((line) => {
+						!line && EOLCount++;
+					});
+
+					expect(EOLCount).to.equal(0);
+
 					done();
 				});
 			});

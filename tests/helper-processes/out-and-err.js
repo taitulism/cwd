@@ -1,4 +1,6 @@
-process.stdout.write('aaa\n');
-process.stderr.write('bbb\n');
-process.stdout.write('ccc\n');
-process.stderr.write('ddd\n');
+const {EOL} = require('os');
+
+process.stdout.write(`out 1${EOL}`);
+process.stderr.write(`err 1${EOL}`);
+process.stdout.write(`out 2${EOL}`);
+process.stderr.write(`err 2${EOL}`);

@@ -1,3 +1,5 @@
+const {EOL} = require('os');
+
 const LINE = 'line';
 const DATA = 'data';
 const STDOUT = 'stdout';
@@ -66,24 +68,19 @@ function registerLineEvent (cp, channel) {
 	cp[channel].setEncoding('utf8').on(DATA, (chunk) => {
 		cp[channel].lineBuffer += chunk;
 
-		/* eslint-disable-next-line newline-after-var */
-		const lines = cp[channel].lineBuffer
-			.split('\n')
-			.map(line => line.trim())
-			// TODO:
-			// .filter(line => line !== '')
-		;
+		const lines = cp[channel].lineBuffer.split(EOL);
 
-		if (lines.length > 0) {
+		if (lines.length) {
 			const lastLine = lines.pop();
 
 			cp[channel].lineBuffer = lastLine;
-		}
 
-		if (lines.length) {
 			lines.forEach((line) => {
 				cp.emit(lineEventName, line);
-				cp.emit(LINE, line);
+
+				if (line) {
+					cp.emit(LINE, line);
+				}
 			});
 
 			cp.emit(eventName, lines);

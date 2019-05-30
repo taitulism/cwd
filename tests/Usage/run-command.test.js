@@ -62,7 +62,7 @@ module.exports = () => {
 
 					expect(returnValue).to.include('aaa')
 						.and.include('bbb')
-						.and.include('ccc')
+						.and.include('ccc');
 				});
 			});
 
@@ -107,7 +107,7 @@ module.exports = () => {
 
 						expect(stdout).to.include('aaa')
 							.and.include('bbb')
-							.and.include('ccc')
+							.and.include('ccc');
 					});
 				});
 			});
