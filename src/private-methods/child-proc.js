@@ -14,7 +14,10 @@ const STDERR_FLAGNAME = 'hasErrors';
 module.exports = {
 	beforeClose (cp) {
 		this.emitLastLines(cp);
-		this.destroyChannels(cp);
+
+		if (cp.killed) {
+			this.destroyChannels(cp);
+		}
 	},
 
 	destroyChannels (cp) {
@@ -70,20 +73,20 @@ function registerLineEvent (cp, channel) {
 
 		const lines = cp[channel].lineBuffer.split(EOL);
 
-		if (lines.length) {
-			const lastLine = lines.pop();
+		if (!lines.length) return;
 
-			cp[channel].lineBuffer = lastLine;
+		const lastLine = lines.pop();
 
-			lines.forEach((line) => {
-				cp.emit(lineEventName, line);
+		cp[channel].lineBuffer = lastLine;
 
-				if (line) {
-					cp.emit(LINE, line);
-				}
-			});
+		lines.forEach((line) => {
+			cp.emit(lineEventName, line);
 
-			cp.emit(eventName, lines);
-		}
+			if (line) {
+				cp.emit(LINE, line);
+			}
+		});
+
+		cp.emit(eventName, lines);
 	});
 }
