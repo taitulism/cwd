@@ -44,12 +44,19 @@ Take care of errors with `promise.catch()` or a `try-catch` wrapper.
 
 **Returns:** A promise for the command results.
 
-The result is an array with 3 items:
-1. **`isOk`** - Boolean - `true` if command exit code is 0. `false` otherwise.
-2. **`stdout`** - String - The process `stdout` string (utf-8 encoded)
-3. **`stderr`** - String - The process `stderr` string (utf-8 encoded)
+The result is an array which also holds named properties like an object.  
+The result array has 3 items:
+* `[0]` Boolean - `true` if command exit code is 0. `false` otherwise (suggested name: `isOk`).
+* `[1]` Array - The commands's `stdout` output, split to lines (suggested name: `stdout`).
+* `[2]` Array - The commands's `stderr` output, split to lines (suggested name: `stderr`).
 
->Both `stdout` & `stderr` strings are buffered and has a max limit of ~ 5MB.  
+The result array also holds the following properties:
+
+* **`isOk`** - Boolean - `true` if command exit code is 0. `false` otherwise.
+* **`stdout`** - String - The commands's `stdout` output string (utf-8 encoded).
+* **`stderr`** - String - The commands's `stderr` output string (utf-8 encoded).
+
+>Both `stdout` & `stderr` are buffered and has a max limit of ~5MB.  
 `runCmd()` will throw an exception when max size is exceeded.
 
 **Examples:**  
@@ -74,9 +81,13 @@ Async-Await Style:
 ```js
 (async () => { // `await` only runs inside async functions
     try {
+        // as array items
         const [isOk, stdout, stderr] = await projectDir.runCmd('git status')
+        // or as props
+        const {isOk, stdout, stderr} = await...
 
         // ...
+
     }
     catch (ex) {
         // handle exception...
@@ -84,11 +95,11 @@ Async-Await Style:
 })();
 ```
 
-Sometime we don't need all of the arguments. You can use ES6 syntax:
+Sometimes you don't need all of the arguments. You can use ES6 syntax:
 ```js
-const [ isOk ] = await projectDir.runCmd()
-// or
-const [,, stderr] = await projectDir.runCmd()
+const [,,stderr ] = await projectDir.runCmd()  // stderr is an array
+// or 
+const {stderr} = await projectDir.runCmd()     // stderr is a string
 ```
 
 ### The difference between `exception` and `stderr`:
