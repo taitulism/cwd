@@ -12,11 +12,11 @@ A wrapper around Node's `child_process.spawn()`.
     ```
 2. Require
     ```js
-    const createCwd = require('run-in-cwd')
+    const Cwd = require('run-in-cwd')
     ```
 3. Create `Cwd` Instance
     ```js
-    const projectDir = createCwd('./path/to/project/folder')
+    const projectDir = new Cwd('./path/to/project/folder')
     ```
 &nbsp; &nbsp; &nbsp; ***NOTE:** Cwd constructor checks path existance synchronously and throws an error if path not found.*
 
@@ -53,23 +53,25 @@ The result is an array with 3 items:
 `runCmd()` will throw an exception when max size is exceeded.
 
 **Examples:**  
+First, create instance:
+```js
+const Cwd = require('run-in-cwd');
+const projectDir = new Cwd('./path/to/project');
+```
+
 Promise Style:
 ```js
-const cwd = require('run-in-cwd')('./path/to/dir')
-
-cwd.runCmd('git status')
-    .then(([isOk, stdout, stderr]) => {
+projectDir.runCmd('git status')
+    .then([isOk, stdout, stderr] => {
         // ...
     })
-    .catch((ex) => {
+    .catch((err) => {
         // handle exception...
     });
 ```
 
 Async-Await Style:
 ```js
-const projectDir = require('run-in-cwd')('./path/to/dir')
-
 (async () => { // `await` only runs inside async functions
     try {
         const [isOk, stdout, stderr] = await projectDir.runCmd('git status')
@@ -84,9 +86,9 @@ const projectDir = require('run-in-cwd')('./path/to/dir')
 
 Sometime we don't need all of the arguments. You can use ES6 syntax:
 ```js
-const [ isOk ] = await cwd.runCmd()
+const [ isOk ] = await projectDir.runCmd()
 // or
-const [,, stderr] = await cwd.runCmd()
+const [,, stderr] = await projectDir.runCmd()
 ```
 
 ### The difference between `exception` and `stderr`:
@@ -122,7 +124,8 @@ Calling `.spawn()` is only the first part of spawning a process. We then need to
 
 First, spawn a child process:
 ```js
-const cwd = require('run-in-cwd')('./path/to/dir')
+const Cwd = require('run-in-cwd');
+const cwd = new Cwd('./path/to/dir');
 
 // Simple command
 const childProc = cwd.spawn('ls')
@@ -156,11 +159,12 @@ Is the same as `.spawn()` but with the `{shell: true}` option.
     Same, but for `child_process.stderr`
 
 ```js
-const cwd = require('run-in-cwd')('./path/to/dir')
+const Cwd = require('run-in-cwd');
+const cwd = new Cwd('./path/to/dir');
 
 const childProc = cwd.spawn('git', ['status']) 
 
-let isClean = false
+let isClean = false;
 
 childProc.on('stdOut', (lines) => {
     lines.forEach(line => {
