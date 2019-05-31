@@ -3,43 +3,28 @@ const {expect} = require('chai');
 const {TEST_DIR} = require('./constants');
 const Cwd = require('../');
 
+const creationErrMsg = 'Cwd expects one argument <String>, a path to a directory.';
+
 module.exports = () => {
 	describe('When called with a path-to-directory', () => {
-		it('it returns an instance', () => {
+		it('it returns a Cwd instance', () => {
 			const cwdInstance = new Cwd(TEST_DIR);
 
 			expect(cwdInstance instanceof Cwd).to.be.true;
 		});
 	});
 
-	describe('When called with no params', () => {
-		it('it throws an error', () => {
-			const shouldThrow = () => new Cwd();
-			const errMsg = 'Expecting one argument <String>, a directory path';
-
-			expect(shouldThrow).to.throw(errMsg);
+	describe('Creation Errors', () => {
+		it('throws when called with no params', () => {
+			expect(() => new Cwd()).to.throw(creationErrMsg);
 		});
-	});
 
-	describe('When called with a non-exist-path', () => {
-		it('it throws an error', () => {
-			const shouldThrow = () => new Cwd('/path/not/exists');
-
-			expect(shouldThrow).to.throw('No Such Directory');
+		it('throws when called with an empty string', () => {
+			expect(() => new Cwd('')).to.throw(creationErrMsg);
 		});
-	});
 
-	describe('When called with any other argument (but string)', () => {
-		it('it throws an error', () => {
-			const shouldThrow1 = () => new Cwd(10);
-			const shouldThrow2 = () => new Cwd('');
-			const shouldThrow3 = () => new Cwd(' ');
-
-			const errMsg = 'Expecting one argument <String>, a directory path';
-
-			expect(shouldThrow1).to.throw(errMsg);
-			expect(shouldThrow2).to.throw(errMsg);
-			expect(shouldThrow3).to.throw(errMsg);
+		it('throws when called with a non string', () => {
+			expect(() => new Cwd(10)).to.throw(creationErrMsg);
 		});
 	});
 };

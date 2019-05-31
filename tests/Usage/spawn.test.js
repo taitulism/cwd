@@ -1,3 +1,5 @@
+/* eslint-disable no-shadow, max-lines */
+
 const {EOL} = require('os');
 const {expect} = require('chai');
 
@@ -390,6 +392,18 @@ module.exports = () => {
 			cwd.spawn('bla').on('error', (err) => {
 				expect(err).to.be.an.instanceof(Error);
 				expect(err.message).to.have.string('bla ENOENT');
+				done();
+			});
+		});
+	});
+
+	describe('When cwd doesn\'t exist (e.g. ``)', () => {
+		it('emits an error event', (done) => {
+			const cwd = new Cwd('../not/exist');
+
+			cwd.spawn('ls').on('error', (err) => {
+				expect(err).to.be.an.instanceof(Error);
+				expect(err.code).to.equal('ENOENT');
 				done();
 			});
 		});
