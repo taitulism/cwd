@@ -4,6 +4,7 @@ const {EOL} = require('os');
 const {expect} = require('chai');
 
 const {TEST_DIR, OTHER_TEST_DIR} = require('../constants');
+const errors = require('../../src/private-methods/errors');
 const Cwd = require('../..');
 
 module.exports = () => {
@@ -149,7 +150,7 @@ module.exports = () => {
 						expect(stdoutBuffer).to.have.string(line);
 					});
 
-					expect(stdoutBuffer.trimRight().split('\n')).to.eql(lineOutArray);
+					expect(stdoutBuffer.trimRight().split(EOL)).to.eql(lineOutArray);
 					done();
 				});
 			});
@@ -383,7 +384,33 @@ module.exports = () => {
 		it('throws an error', () => {
 			const shouldThrow = () => cwd.spawn();
 
-			expect(shouldThrow).to.throw('First argument (cmd) must be a string');
+			expect(shouldThrow).to.throw(errors.CmdIsNotString);
+		});
+	});
+
+	describe('When called with a command argument that is string', () => {
+		it('works', (done) => {
+			const MY_ARG = 'myArg';
+			const file = '../helper-processes/return-called-with.js';
+
+			cwd.spawn(`node ${file}`, MY_ARG)
+				.on('line', (line) => {
+					expect(line).to.equal(MY_ARG);
+					done();
+				});
+		});
+	});
+
+	describe('When called with a command argument that is number', () => {
+		it('works', (done) => {
+			const MY_ARG = 42;
+			const file = '../helper-processes/return-called-with.js';
+
+			cwd.spawn(`node ${file}`, MY_ARG)
+				.on('line', (line) => {
+					expect(line).to.equal(MY_ARG.toString());
+					done();
+				});
 		});
 	});
 

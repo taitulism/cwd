@@ -20,23 +20,21 @@ async function getFiles () {
 
 (async () => {
 try {
-	await execFile('echod hello', (err, out, warns) => {
-		console.log('err', err);
-		console.log('out', out);
-		console.log('warns', warns);
-	})
+	// await execFile('echod hello', (err, out, warns) => {
+	// 	console.log('err', err);
+	// 	console.log('out', out);
+	// 	console.log('warns', warns);
+	// })
 
-	return;
+	// return;
 
 
 
 	// const cp = spawn('ls &&', ['echo hiiii', '&& echo bye'], {shell:true})
-	const cp = cwd.spawn('ls ', ['./'])
+	const cp = cwd.spawn('  ls ', ['./'])
 
-	cp.on('stdOut', (lines) => {
-		lines.forEach((line) => {
-			console.log('LINE:', line);
-		})
+	cp.on('line', (lines) => {
+		console.log('LINE:', line);
 	})
 	// cp.stdout.on('data', (chunk) => {
 	// 	console.log('CHUNK:', chunk.toString());

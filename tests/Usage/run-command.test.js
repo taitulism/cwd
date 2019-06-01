@@ -1,6 +1,7 @@
 const {expect} = require('chai');
 
 const {TEST_DIR} = require('../constants');
+const errors = require('../../src/private-methods/errors');
 const Cwd = require('../..');
 
 module.exports = () => {
@@ -176,10 +177,9 @@ module.exports = () => {
 
 	describe('When called without arguments', () => {
 		it('rejects with an error', () => {
-			const rejectionMsg = 'First argument (cmd) must be a string';
 			const shouldReject = () => cwd.runCmd();
 
-			expect(shouldReject()).to.be.rejectedWith(rejectionMsg);
+			return expect(shouldReject()).to.be.rejectedWith(errors.CmdIsNotString);
 		});
 	});
 
@@ -187,7 +187,7 @@ module.exports = () => {
 		it('rejects with an error', () => {
 			const shouldReject = () => cwd.runCmd('bla');
 
-			expect(shouldReject()).to.be.rejectedWith('bla ENOENT');
+			return expect(shouldReject()).to.be.rejectedWith('bla ENOENT');
 		});
 	});
 };

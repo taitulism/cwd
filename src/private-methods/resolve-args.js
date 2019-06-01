@@ -1,20 +1,37 @@
 const normalizeArgs = require('./normalize-arguments');
-const getLogMsg = require('./get-log-msg');
+const {CmdIsNotString, CmdIsEmptyString} = require('./errors');
 
-module.exports = function resolveArgs (cmd, maybeArgs, maybeOptions) {
-	validateCommand(cmd);
+module.exports = function resolveArgs (rawCmd, maybeArgs, maybeOptions) {
+	validateCommand(rawCmd);
 
-	const [cmdArgs, options] = normalizeArgs(maybeArgs, maybeOptions);
+	const [cmd, rawArgs] = parseCmd(rawCmd);
+
+	const [additionalArgs, options] = normalizeArgs(maybeArgs, maybeOptions);
+
+	const cmdArgs = rawArgs.concat(additionalArgs);
 
 	return [cmd, cmdArgs, options];
 };
 
 function validateCommand (rawCmd) {
-	const isValid = (typeof rawCmd === 'string') && rawCmd.length > 0;
+	if (typeof rawCmd !== 'string') throw new Error(CmdIsNotString);
 
-	if (isValid) return;
+	if (rawCmd.length === 0) throw new Error(CmdIsEmptyString);
+}
 
-	const errMsg = getLogMsg.emptyCmd();
+function parseCmd (rawCmd) {
+	let cmd, cmdArgs;
 
-	throw new Error(errMsg);
+	cmd = rawCmd.trim();
+	const hasSpaces = (/\s/u).test(cmd);
+
+	if (hasSpaces) {
+		cmdArgs = rawCmd.split(/\s+/u);
+		cmd = cmdArgs.shift();
+	}
+
+	cmd = cmd || rawCmd;
+	cmdArgs = cmdArgs || [];
+
+	return [cmd, cmdArgs];
 }
