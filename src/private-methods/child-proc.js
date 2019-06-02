@@ -1,5 +1,3 @@
-const {EOL} = require('os');
-
 const LINE = 'line';
 const DATA = 'data';
 const STDOUT = 'stdout';
@@ -71,7 +69,7 @@ function registerLineEvent (cp, channel) {
 	cp[channel].setEncoding('utf8').on(DATA, (chunk) => {
 		cp[channel].lineBuffer += chunk;
 
-		const lines = cp[channel].lineBuffer.split(EOL);
+		const lines = cp[channel].lineBuffer.split(/\r?\n/u);
 
 		if (!lines.length) return;
 

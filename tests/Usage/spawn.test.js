@@ -150,7 +150,7 @@ module.exports = () => {
 						expect(stdoutBuffer).to.have.string(line);
 					});
 
-					expect(stdoutBuffer.trimRight().split(EOL)).to.eql(lineOutArray);
+					expect(stdoutBuffer.trimRight().split(/\r?\n/u)).to.eql(lineOutArray);
 					done();
 				});
 			});
