@@ -1,6 +1,6 @@
 {
 	"name": "run-in-cwd",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"description": "A wrapper for Node's `child_process` module",
 	"keywords": [
 		"spawn",
@@ -14,9 +14,9 @@
 		"run command",
 		"cmd"
 	],
-	"main": "index.js",
+	"main": "./index.js",
 	"scripts": {
-		"tdd": "mocha ./tests --watch",
+		"dev": "mocha ./tests --bail --watch",
 		"test": "mocha ./tests",
 		"lint": "eslint ./src ./tests",
 		"preversion": "npm run lint && npm test",

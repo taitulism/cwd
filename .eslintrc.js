@@ -27,6 +27,7 @@ module.exports = {
 			"prefer-arrow-callback": "off",
 			"global-require": "off",
 			"no-new": "off",
+			"no-shadow": "off",
 		},
 	}],
 	"rules": {
@@ -92,7 +93,9 @@ module.exports = {
 		"max-depth": "error",
 		"max-len": ["error", {
 			"code": 90,
-			"tabWidth": 4
+			"tabWidth": 4,
+			"ignoreStrings": true,
+			"ignoreTemplateLiterals": true,
 		}],
 		"max-lines": "error",
 		"max-lines-per-function": ["warn", 70],
@@ -102,7 +105,9 @@ module.exports = {
 		"max-statements-per-line": "error",
 //	  "multiline-comment-style": "off",
 		"multiline-ternary": "error",
-		"new-cap": "error",
+		"new-cap": ["error", {
+			"capIsNew": false,
+		}],
 		"new-parens": "error",
 		"newline-after-var": [
 			"error",

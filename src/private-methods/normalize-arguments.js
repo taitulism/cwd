@@ -1,56 +1,49 @@
-/* eslint-disable max-statements */
+const {ExpectedObject, ExpectedArray} = require('./errors');
 
-const getLogMsg = require('./get-log-msg');
+module.exports = function normalizeArgs (maybeArgs, maybeOpts) {
+	if (!maybeArgs && !maybeOpts) return [[], {}];
 
-module.exports = function normalizeArgs (maybeArgs, maybeOptions) {
-	// neither
-	if (!maybeArgs && !maybeOptions) return [[], {}];
-
-	// both
-	if (maybeArgs && maybeOptions) {
-		if (isArray(maybeArgs) && isObject(maybeOptions)) {
-			return [maybeArgs, maybeOptions];
-		}
-
-		if (isArray(maybeOptions) && isObject(maybeArgs)) {
-			return [maybeOptions, maybeArgs];
-		}
-
-		const errMsg = getLogMsg.expectedTypes(maybeArgs, maybeOptions);
+	if (maybeOpts && !isObject(maybeOpts)) {
+		const errMsg = ExpectedObject(maybeOpts);
 
 		throw new Error(errMsg);
 	}
 
-	const cmdArgs = [];
-	const options = {};
+	let cmdArgs, options;
 
-	// only one
-	if (maybeArgs) {
-		if (isArray(maybeArgs)) {
-			cmdArgs.push(...maybeArgs);
-		}
-		else if (isObject(maybeArgs)) {
-			Object.assign(options, maybeArgs);
-		}
+	if (!maybeArgs) {
+		cmdArgs = [];
 	}
-	else if (maybeOptions) {
-		if (isArray(maybeOptions)) {
-			cmdArgs.push(...maybeOptions);
-		}
-		else if (isObject(maybeOptions)) {
-			Object.assign(options, maybeOptions);
-		}
+	else if (isArray(maybeArgs)) {
+		cmdArgs = maybeArgs;
 	}
+	else if (isStringOrNumber(maybeArgs)) {
+		cmdArgs = [maybeArgs];
+	}
+	else if (isObject(maybeArgs) && !maybeOpts) {
+		cmdArgs = [];
+		options = maybeArgs;
+	}
+	else {
+		const errMsg = ExpectedArray(maybeArgs);
+
+		throw new Error(errMsg);
+	}
+
+	options = options || maybeOpts || {};
 
 	return [cmdArgs, options];
 };
-
 
 
 function isArray (thing) {
 	return Array.isArray(thing);
 }
 
+function isStringOrNumber (thing) {
+	return typeof thing === 'string' || typeof thing === 'number';
+}
+
 function isObject (thing) {
-	return Object.prototype.toString.call(thing) === '[object Object]';
+	return thing !== null && Object.prototype.toString.call(thing) === '[object Object]';
 }

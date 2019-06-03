@@ -1,15 +1,24 @@
+const {spawn: nativeSpawn} = require('child_process');
+
 const resolveArgs = require('./private-methods/resolve-args');
-const parseCmd = require('./private-methods/parse-command');
+const childProcLib = require('./private-methods/child-proc');
 
 module.exports = function spawn (...args) {
-	const [rawCmd, rawCmdArgs, options] = resolveArgs(...args);
-	const [cmd, cmdArgs, needShell] = parseCmd(rawCmd, rawCmdArgs);
+	const [cmd, cmdArgs, options] = resolveArgs(...args);
 
-	if (needShell && !options.shell) {
-		options.shell = true;
-	}
+	options.cwd = options.cwd || this.dirPath;
 
-	const childProc = this._spawn(cmd, cmdArgs, options);
+	const cp = nativeSpawn(cmd, cmdArgs, options);
 
-	return childProc;
+	cp.on('error', () => {
+		childProcLib.beforeClose(cp);
+	});
+
+	childProcLib.registerLineEvents(cp);
+
+	cp.on('close', () => {
+		childProcLib.emitLastLines(cp);
+	});
+
+	return cp;
 };

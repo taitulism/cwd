@@ -12,11 +12,11 @@ A wrapper around Node's `child_process.spawn()`.
     ```
 2. Require
     ```js
-    const createCwd = require('run-in-cwd')
+    const Cwd = require('run-in-cwd')
     ```
 3. Create `Cwd` Instance
     ```js
-    const projectDir = createCwd('./path/to/project/folder')
+    const projectDir = new Cwd('./path/to/project/folder')
     ```
 &nbsp; &nbsp; &nbsp; ***NOTE:** Cwd constructor checks path existance synchronously and throws an error if path not found.*
 
@@ -44,37 +44,50 @@ Take care of errors with `promise.catch()` or a `try-catch` wrapper.
 
 **Returns:** A promise for the command results.
 
-The result is an array with 3 items:
-1. **`isOk`** - Boolean - `true` if command exit code is 0. `false` otherwise.
-2. **`stdout`** - String - The process `stdout` string (utf-8 encoded)
-3. **`stderr`** - String - The process `stderr` string (utf-8 encoded)
+The result is an array which also holds named properties like an object.  
+The result array has 3 items:
+* `[0]` Boolean - `true` if command exit code is 0. `false` otherwise (suggested name: `isOk`).
+* `[1]` Array - The commands's `stdout` output, split to lines (suggested name: `stdout`).
+* `[2]` Array - The commands's `stderr` output, split to lines (suggested name: `stderr`).
 
->Both `stdout` & `stderr` strings are buffered and has a max limit of ~ 5MB.  
+The result array also holds the following properties:
+
+* **`isOk`** - Boolean - `true` if command exit code is 0. `false` otherwise.
+* **`stdout`** - String - The commands's `stdout` output string (utf-8 encoded).
+* **`stderr`** - String - The commands's `stderr` output string (utf-8 encoded).
+
+>Both `stdout` & `stderr` are buffered and has a max limit of ~5MB.  
 `runCmd()` will throw an exception when max size is exceeded.
 
 **Examples:**  
+First, create instance:
+```js
+const Cwd = require('run-in-cwd');
+const projectDir = new Cwd('./path/to/project');
+```
+
 Promise Style:
 ```js
-const cwd = require('run-in-cwd')('./path/to/dir')
-
-cwd.runCmd('git status')
-    .then(([isOk, stdout, stderr]) => {
+projectDir.runCmd('git status')
+    .then([isOk, stdout, stderr] => {
         // ...
     })
-    .catch((ex) => {
+    .catch((err) => {
         // handle exception...
     });
 ```
 
 Async-Await Style:
 ```js
-const projectDir = require('run-in-cwd')('./path/to/dir')
-
 (async () => { // `await` only runs inside async functions
     try {
+        // as array items
         const [isOk, stdout, stderr] = await projectDir.runCmd('git status')
+        // or as props
+        const {isOk, stdout, stderr} = await...
 
         // ...
+
     }
     catch (ex) {
         // handle exception...
@@ -82,11 +95,11 @@ const projectDir = require('run-in-cwd')('./path/to/dir')
 })();
 ```
 
-Sometime we don't need all of the arguments. You can use ES6 syntax:
+Sometimes you don't need all of the arguments. You can use ES6 syntax:
 ```js
-const [ isOk ] = await cwd.runCmd()
-// or
-const [,, stderr] = await cwd.runCmd()
+const [,,stderr ] = await projectDir.runCmd()  // stderr is an array
+// or 
+const {stderr} = await projectDir.runCmd()     // stderr is a string
 ```
 
 ### The difference between `exception` and `stderr`:
@@ -122,7 +135,8 @@ Calling `.spawn()` is only the first part of spawning a process. We then need to
 
 First, spawn a child process:
 ```js
-const cwd = require('run-in-cwd')('./path/to/dir')
+const Cwd = require('run-in-cwd');
+const cwd = new Cwd('./path/to/dir');
 
 // Simple command
 const childProc = cwd.spawn('ls')
@@ -134,8 +148,7 @@ const childProc = cwd.spawn('git', ['status'])
 const childProc = cwd.spawn('git status')
 
 // and also:
-const childProc = cwd.spawn('git add -A && git commit')
-// Shell signs like '|', '&', '>', ';' are used to automatically spawn with a shell.
+const childProc = cwd.spawnShell('git add -A && git commit')
 ```
 
 ------------------------------------------------------------
@@ -149,19 +162,30 @@ Is the same as `.spawn()` but with the `{shell: true}` option.
 ---------------------
 `.spawn`'s return object is [Node's native ChildProcess](https://nodejs.org/api/child_process.html#child_process_class_childprocess) with some extra events.
 
+* ### Event: `'line'`
+    Is triggered for each line of both `stdout` and `stderr` streams. Buffers data chunks and emits a `line` event for every newline character (`\n`). Ignores empty lines.
+
+* ### Event: `'line/out'`
+    Same as `line` event, but for `stdout` only.
+    
+* ### Event: `'line/err'`
+    Same as `line` event, but for `stderr` only.
+
 * ### Event: `'stdOut'`  
     Is triggered when `child_process.stdout.on('data')` is triggered (excluding empty lines).
-    The event data is the `stdout` split into an array of `UTF-8` strings.
+    The event data is the `stdout` split into an **array** of `UTF-8` strings (`stdout` lines array).
 
 * ### Event: `'stdErr'`
     Same, but for `child_process.stderr`
 
+
 ```js
-const cwd = require('run-in-cwd')('./path/to/dir')
+const Cwd = require('run-in-cwd');
+const cwd = new Cwd('./path/to/dir');
 
 const childProc = cwd.spawn('git', ['status']) 
 
-let isClean = false
+let isClean = false;
 
 childProc.on('stdOut', (lines) => {
     lines.forEach(line => {
@@ -194,7 +218,7 @@ When you need to run multiple commands on the same directory and it's not your *
 *With `CWD` you only do it once.*
 ```js
 const childProc = require('child_process')
-const cwd = require('run-in-cwd')
+const Cwd = require('run-in-cwd')
 
 // Node's child process
 childProc.spawn('git', ['status'], {cwd: './sub-dir'})
@@ -202,7 +226,7 @@ childProc.spawn('git', ['add', '-A'], {cwd: './sub-dir'})
 childProc.spawn('git', ['commit'], {cwd: './sub-dir'})
 
 // run-in-cwd
-const subDir = cwd('./sub-dir')
+const subDir = new Cwd('./my-folder')
 
 subDir.spawn('git', ['status'])
 subDir.spawn('git', ['add', '-A'])
@@ -215,16 +239,27 @@ When you want to run a simple command with a simple argument like: `ls -l` you w
 
 ```js
 const childProc = require('child_process')
-const cwd = require('run-in-cwd')
 
 // :(
 childProc.spawn('ls', ['-l'])
 childProc.spawn('ls -l', {shell: true})
 ```
-With `run-in-cwd` you simply do it like:
+With `run-in-cwd` you do it like:
 ```js
+const Cwd = require('run-in-cwd')
+const cwd = new Cwd();
+
 // :D
-cwd.spawn('ls -l')
+cwd().spawn('ls -l')
+```
+The whole command string is split by spaces and then transformed into:
+```js
+.spawn('ls', ['-l'])
+```
+
+If you need a shell - use `spawnShell` instead of `spawn`:
+```js
+cwd.spawnShell('ls -l')
 ```
 The whole command string is split by spaces and then transformed into:
 ```js

@@ -16,17 +16,20 @@ module.exports = () => {
 	});
 
 	describe('When command is legit (e.g. `ls`)', () => {
-		it('spawns with a shell', (done) => {
+		it('spawns with a shell', async () => {
 			const spy = sinon.spy(Object.getPrototypeOf(cwd), 'spawn');
 
-			cwd.spawnShell('ls').on('close', () => {
+			try {
+				await cwd.runShellCmd('ls');
 				expect(spy.callCount).to.equal(1);
 				expect(spy.firstCall.args).to.have.lengthOf(3);
 				expect(spy.firstCall.args[2]).to.be.an('object');
 				expect(spy.firstCall.args[2].shell).to.be.true;
 				spy.restore();
-				done();
-			});
+			}
+			catch (ex) {
+				expect(false).to.be.true;
+			}
 		});
 	});
 };

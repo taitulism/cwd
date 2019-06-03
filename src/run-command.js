@@ -1,13 +1,12 @@
 /* eslint-disable max-lines-per-function */
 
+// eslint-disable-next-line no-magic-numbers
+const maxBuffer = 1024 * 1024 * 5; // ~5MB
+
 module.exports = function runCmd (cmdStr, ...rest) {
 	// eslint-disable-next-line consistent-return
 	return new Promise((resolve, reject) => {
 		let exception = null;
-
-		// eslint-disable-next-line no-magic-numbers
-		const maxBuffer = 1024 * 1024 * 5; // ~5MB
-
 		let childProc;
 
 		try {
@@ -61,13 +60,16 @@ module.exports = function runCmd (cmdStr, ...rest) {
 			stderrLines.push(...lines);
 		});
 
-		childProc.on('close', (code) => {
+		childProc.on('close', (exitCode) => {
 			if (exception) return reject(exception);
 
-			const stdout = stdoutLines.join('\n');
-			const stderr = stderrLines.join('\n');
+			const resultArray = [exitCode === 0, stderrLines, stdoutLines];
 
-			return resolve([code === 0, stdout, stderr]);
+			resultArray.exitCode = exitCode;
+			resultArray.stderr = stderrLines.join('\n');
+			resultArray.stdout = stdoutLines.join('\n');
+
+			return resolve(resultArray);
 		});
 	});
 };
