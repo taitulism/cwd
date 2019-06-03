@@ -162,12 +162,22 @@ Is the same as `.spawn()` but with the `{shell: true}` option.
 ---------------------
 `.spawn`'s return object is [Node's native ChildProcess](https://nodejs.org/api/child_process.html#child_process_class_childprocess) with some extra events.
 
+* ### Event: `'line'`
+    Is triggered for each line of both `stdout` and `stderr` streams. Buffers data chunks and emits a `line` event for every newline character (`\n`). Ignores empty lines.
+
+* ### Event: `'line/out'`
+    Same as `line` event, but for `stdout` only.
+    
+* ### Event: `'line/err'`
+    Same as `line` event, but for `stderr` only.
+
 * ### Event: `'stdOut'`  
     Is triggered when `child_process.stdout.on('data')` is triggered (excluding empty lines).
-    The event data is the `stdout` split into an array of `UTF-8` strings.
+    The event data is the `stdout` split into an **array** of `UTF-8` strings (`stdout` lines array).
 
 * ### Event: `'stdErr'`
     Same, but for `child_process.stderr`
+
 
 ```js
 const Cwd = require('run-in-cwd');
