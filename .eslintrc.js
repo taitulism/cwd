@@ -27,6 +27,7 @@ module.exports = {
 			"prefer-arrow-callback": "off",
 			"global-require": "off",
 			"no-new": "off",
+			"no-shadow": "off",
 		},
 	}],
 	"rules": {
