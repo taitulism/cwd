@@ -44,17 +44,13 @@ Take care of errors with `promise.catch()` or a `try-catch` wrapper.
 
 **Returns:** A promise for the command results.
 
-The result is an array which also holds named properties like an object.  
-The result array has 3 items:
-* `[0]` Boolean - `true` if command exit code is 0. `false` otherwise (suggested name: `isOk`).
-* `[1]` Array - The commands's `stdout` output, split to lines (suggested name: `stdout`).
-* `[2]` Array - The commands's `stderr` output, split to lines (suggested name: `stderr`).
-
-The result array also holds the following properties:
-
+The promised result is an object with the following properties:  
+* **`exitCode`** - Number - The command exit code.
 * **`isOk`** - Boolean - `true` if command exit code is 0. `false` otherwise.
 * **`stdout`** - String - The commands's `stdout` output string (utf-8 encoded).
 * **`stderr`** - String - The commands's `stderr` output string (utf-8 encoded).
+* **`stdoutLines`** - Array - The commands's `stdout` output, split to lines.
+* **`stderrLines`** - Array -The commands's `stderr` output, split to lines.
 
 >Both `stdout` & `stderr` are buffered and has a max limit of ~5MB.  
 `runCmd()` will throw an exception when max size is exceeded.
@@ -69,7 +65,7 @@ const projectDir = new Cwd('./path/to/project');
 Promise Style:
 ```js
 projectDir.runCmd('git status')
-    .then([isOk, stdout, stderr] => {
+    .then({isOk, stderr} => {
         // ...
     })
     .catch((err) => {
@@ -81,13 +77,9 @@ Async-Await Style:
 ```js
 (async () => { // `await` only runs inside async functions
     try {
-        // as array items
-        const [isOk, stdout, stderr] = await projectDir.runCmd('git status')
-        // or as props
-        const {isOk, stdout, stderr} = await...
+        const {isOk, stdoutLines} = await projectDir.runCmd('git status')
 
         // ...
-
     }
     catch (ex) {
         // handle exception...
@@ -95,18 +87,14 @@ Async-Await Style:
 })();
 ```
 
-Sometimes you don't need all of the arguments. You can use ES6 syntax:
-```js
-const [,,stderr ] = await projectDir.runCmd()  // stderr is an array
-// or 
-const {stderr} = await projectDir.runCmd()     // stderr is a string
-```
 
-### The difference between `exception` and `stderr`:
+### The difference between `exception` and `!isOk`:
 `exception` is an `Error` instance thrown when the execution of a command had a problem:  
 the command itself is not found, max buffer size exceeded, machine is on fire etc.
 
 A running process has two output channels: one for regular output (`childProc.stdout`), and one for errors (`childProc.stderr`). The result `stderr` is a string which is buffered from the command's `stderr` output channel.
+
+&nbsp;
 
 &nbsp;
 
@@ -221,16 +209,16 @@ const childProc = require('child_process')
 const Cwd = require('run-in-cwd')
 
 // Node's child process
-childProc.spawn('git', ['status'], {cwd: './sub-dir'})
-childProc.spawn('git', ['add', '-A'], {cwd: './sub-dir'})
-childProc.spawn('git', ['commit'], {cwd: './sub-dir'})
+childProc.spawn('git', ['status'], {cwd: './my-folder'})
+childProc.spawn('git', ['add', '-A'], {cwd: './my-folder'})
+childProc.spawn('git', ['commit'], {cwd: './my-folder'})
 
 // run-in-cwd
-const subDir = new Cwd('./my-folder')
+const myFolder = new Cwd('./my-folder')
 
-subDir.spawn('git', ['status'])
-subDir.spawn('git', ['add', '-A'])
-subDir.spawn('git', ['commit'])
+myFolder.spawn('git', ['status'])
+myFolder.spawn('git', ['add', '-A'])
+myFolder.spawn('git', ['commit'])
 ```
 
 &nbsp;

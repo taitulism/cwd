@@ -63,13 +63,14 @@ module.exports = function runCmd (cmdStr, ...rest) {
 		childProc.on('close', (exitCode) => {
 			if (exception) return reject(exception);
 
-			const resultArray = [exitCode === 0, stderrLines, stdoutLines];
-
-			resultArray.exitCode = exitCode;
-			resultArray.stderr = stderrLines.join('\n');
-			resultArray.stdout = stdoutLines.join('\n');
-
-			return resolve(resultArray);
+			return resolve({
+				exitCode,
+				isOk: exitCode === 0,
+				stdout: stdoutLines.join('\n'),
+				stderr: stderrLines.join('\n'),
+				stdoutLines,
+				stderrLines,
+			});
 		});
 	});
 };
