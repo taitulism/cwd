@@ -3,7 +3,7 @@ run-in-cwd
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/taitulism/cwd.svg?branch=master)](https://travis-ci.org/taitulism/cwd)
 
-A wrapper around Node's `child_process.spawn()`.
+Run CLI commands with Node.
 
 ## Get Started
 1. Install 
@@ -18,16 +18,27 @@ A wrapper around Node's `child_process.spawn()`.
     ```js
     const projectDir = new Cwd('./path/to/project/folder')
     ```
-&nbsp; &nbsp; &nbsp; ***NOTE:** Cwd constructor checks path existance synchronously and throws an error if path not found.*
+4. Run a command
+    ```js
+    // run to completion
+    projectDir.runCmd('git status').then(...)
+
+    // run with more control
+    projectDir.spawn('git status')
+        .on('line/out', (line) => {...})
+        .on('error', (err) => {...})
+        .on('close', (exitCode) => {...})
+    ```
+
+&nbsp;
+
+>**WARNING:** If you let your users pass in the command and/or any of its arguments - make sure they are safe and don't forget to handle errors.
 
 &nbsp;
 
 
 
-
 ## Instance API
-
->**WARNING:** If you let your users pass in the command and/or any of its arguments - make sure they are safe and don't forget to handle errors.
 
 ------------------------------------------------------------
 ### **.runCmd(** cmd, [args, [options] ] **)**
@@ -56,13 +67,13 @@ The promised result is an object with the following properties:
 `runCmd()` will throw an exception when max size is exceeded.
 
 **Examples:**  
-First, create instance:
+First, create an instance:
 ```js
 const Cwd = require('run-in-cwd');
 const projectDir = new Cwd('./path/to/project');
 ```
 
-Promise Style:
+Use Promise Style:
 ```js
 projectDir.runCmd('git status')
     .then({isOk, stderr} => {
@@ -73,7 +84,7 @@ projectDir.runCmd('git status')
     });
 ```
 
-Async-Await Style:
+Use with Async-Await:
 ```js
 (async () => { // `await` only runs inside async functions
     try {
@@ -88,11 +99,15 @@ Async-Await Style:
 ```
 
 
-### The difference between `exception` and `!isOk`:
-`exception` is an `Error` instance thrown when the execution of a command had a problem:  
-the command itself is not found, max buffer size exceeded, machine is on fire etc.
+## The difference between `!isOk` (not ok) and `exception`:
+A CLI command has two output channels it can use to communicate with the process who ran it: one for the command's standard output (`stdout`), and one for its errors (`stderr`).
+It can also utilize an exit code for when it completes. The consensus is exit code `0` for success (a kind of a "200 OK" HTTP response status code) and non-zero otherwise.
 
-A running process has two output channels: one for regular output (`childProc.stdout`), and one for errors (`childProc.stderr`). The result `stderr` is a string which is buffered from the command's `stderr` output channel.
+Each command can utilize those channels and exit codes differently, even "incorrectly" as there is no standard other than subjective common sense...
+
+So when a command fails it will probably send some details through its `stderr` channel and exit with a non-zero exit code but it **will** be completed. No errors will be thrown in the Node process that executed the command.
+
+An `exception` is thrown when there was a problem with the command **execution** in our environment. For example when the command itself is not found (e.g. a typo like `ggit` instead of `git`) or when the command tries to write stuff but you have no free storage, etc.
 
 &nbsp;
 
