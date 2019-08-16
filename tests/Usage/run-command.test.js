@@ -16,7 +16,37 @@ module.exports = () => {
 	});
 
 	describe('When command is legit (e.g. `ls`)', () => {
+		it('returns a promise', () => {
+			const promise = cwd.runCmd('ls');
+
+			expect(promise).to.be.instanceOf(Promise);
+		});
+
+		it('that resolves with an object', () => (
+			expect(cwd.runCmd('ls')).to.eventually.be.an('object')
+		));
+
 		describe('Returned Object Props', () => {
+			describe('.exitCode', () => {
+				it('Number', async () => {
+					const {exitCode} = await cwd.runCmd('ls');
+
+					expect(exitCode).to.be.a('number');
+				});
+
+				it('equal 0 when everything is ok', async () => {
+					const {exitCode} = await cwd.runCmd('ls');
+
+					expect(exitCode).to.equal(0);
+				});
+
+				it('is not 0 when something went wrong', async () => {
+					const {exitCode} = await cwd.runCmd('ls', ['./bla']);
+
+					expect(exitCode).to.not.equal(0);
+				});
+			});
+
 			describe('.isOk', () => {
 				it('is true when exit code is 0', async () => {
 					const {isOk} = await cwd.runCmd('ls');
@@ -31,52 +61,8 @@ module.exports = () => {
 				});
 			});
 
-			describe('.stderrLines', () => {
-				it('is an array', async () => {
-					const {stderrLines} = await cwd.runCmd('ls', ['./bla']);
-
-					expect(stderrLines).to.be.an('array');
-				});
-
-				it('is the command errors', async () => {
-					const {stderrLines} = await cwd.runCmd('ls', ['./bla']);
-
-					expect(stderrLines[0]).to.have.string('No such file or directory');
-				});
-			});
-
-			describe('.stdoutLines', () => {
-				it('is an array', async () => {
-					const {stdoutLines} = await cwd.runCmd('ls');
-
-					expect(stdoutLines).to.be.an('array');
-				});
-
-				it('is the command output', async () => {
-					const {stdoutLines} = await cwd.runCmd('ls');
-
-					expect(stdoutLines).to.include('aaa')
-						.and.include('bbb')
-						.and.include('ccc');
-				});
-			});
-
-			describe('.exitCode', () => {
-				it('is a number', async () => {
-					const {exitCode} = await cwd.runCmd('ls');
-
-					expect(exitCode).to.be.a('number');
-				});
-
-				it('equal 0 when everything is ok', async () => {
-					const {exitCode} = await cwd.runCmd('ls');
-
-					expect(exitCode).to.equal(0);
-				});
-			});
-
 			describe('.stderr', () => {
-				it('is a string', async () => {
+				it('String', async () => {
 					const {stderr} = await cwd.runCmd('ls');
 
 					expect(stderr).to.be.a('string');
@@ -90,7 +76,7 @@ module.exports = () => {
 			});
 
 			describe('.stdout', () => {
-				it('is a string', async () => {
+				it('String', async () => {
 					const {stdout} = await cwd.runCmd('ls');
 
 					expect(stdout).to.be.a('string');
@@ -100,6 +86,36 @@ module.exports = () => {
 					const {stdout} = await cwd.runCmd('ls');
 
 					expect(stdout).to.include('aaa')
+						.and.include('bbb')
+						.and.include('ccc');
+				});
+			});
+
+			describe('.stderrLines', () => {
+				it('Array', async () => {
+					const {stderrLines} = await cwd.runCmd('ls', ['./bla']);
+
+					expect(stderrLines).to.be.an('array');
+				});
+
+				it('is the command stderr split into lines', async () => {
+					const {stderrLines} = await cwd.runCmd('ls', ['./bla']);
+
+					expect(stderrLines[0]).to.have.string('No such file or directory');
+				});
+			});
+
+			describe('.stdoutLines', () => {
+				it('Array', async () => {
+					const {stdoutLines} = await cwd.runCmd('ls');
+
+					expect(stdoutLines).to.be.an('array');
+				});
+
+				it('is the command stdout split into lines', async () => {
+					const {stdoutLines} = await cwd.runCmd('ls');
+
+					expect(stdoutLines).to.include('aaa')
 						.and.include('bbb')
 						.and.include('ccc');
 				});
