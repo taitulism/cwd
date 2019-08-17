@@ -109,10 +109,7 @@ module.exports = {
 			"capIsNew": false,
 		}],
 		"new-parens": "error",
-		"newline-after-var": [
-			"error",
-			"always"
-		],
+//	  "newline-after-var": [ "off", "always" ],
 		"newline-before-return": "error",
 		"newline-per-chained-call": ["error", {
 			"ignoreChainWithDepth": 3
