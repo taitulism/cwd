@@ -50,14 +50,14 @@ module.exports = function runCmd (cmdStr, ...rest) {
 
 		const stdoutLines = [];
 
-		childProc.on('stdOut', (lines) => {
-			stdoutLines.push(...lines);
+		childProc.on('line/out', (line) => {
+			stdoutLines.push(line);
 		});
 
 		const stderrLines = [];
 
-		childProc.on('stdErr', (lines) => {
-			stderrLines.push(...lines);
+		childProc.on('line/err', (line) => {
+			stderrLines.push(line);
 		});
 
 		childProc.on('close', (exitCode) => {

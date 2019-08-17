@@ -63,7 +63,7 @@ The promised result is an object with the following properties:
 * **`stdoutLines`** - Array - The commands's `stdout` output, split to lines.
 * **`stderrLines`** - Array -The commands's `stderr` output, split to lines.
 
->Both `stdout` & `stderr` are buffered and has a max limit of ~5MB.  
+>Both `stdout` & `stderr` are buffered and each has a max limit of ~5MB.  
 `runCmd()` will throw an exception when max size is exceeded.
 
 **Examples:**  
@@ -174,13 +174,6 @@ Is the same as `.spawn()` but with the `{shell: true}` option.
 * ### Event: `'line/err'`
     Same as `line` event, but for `stderr` only.
 
-* ### Event: `'stdOut'`  
-    Is triggered when `child_process.stdout.on('data')` is triggered (excluding empty lines).
-    The event data is the `stdout` split into an **array** of `UTF-8` strings (`stdout` lines array).
-
-* ### Event: `'stdErr'`
-    Same, but for `child_process.stderr`
-
 
 ```js
 const Cwd = require('run-in-cwd');
@@ -190,12 +183,10 @@ const childProc = cwd.spawn('git', ['status'])
 
 let isClean = false;
 
-childProc.on('stdOut', (lines) => {
-    lines.forEach(line => {
-        if (line.includes('nothing to commit')) {
-            isClean = true;
-        }
-    });
+childProc.on('line/out', (line) => {
+    if (line.includes('nothing to commit')) {
+        isClean = true;
+    }
 })
 
 childProc.on('close', (exitCode) => {
