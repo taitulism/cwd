@@ -154,6 +154,51 @@ module.exports = () => {
 					done();
 				});
 			});
+
+			it('discards empty lines', (done) => {
+				const file = '../helper-processes/output-empty-lines.js';
+
+				const childProc = cwd.spawn(`node ${file}`);
+
+				let stdoutBuffer = '';
+				const lines = [];
+
+				childProc.stdout.on('data', (chunk) => {
+					stdoutBuffer += chunk;
+				});
+
+				childProc.on('line/out', (line) => {
+					lines.push(line);
+				});
+
+				childProc.on('close', () => {
+					// test the native stdout string for reference
+					const splitBuffer = stdoutBuffer.split(EOL);
+
+					expect(splitBuffer).to.have.lengthOf(8);
+
+					let EOLCount = 0;
+
+					splitBuffer.forEach((line) => {
+						!line && EOLCount++;
+					});
+
+					expect(EOLCount).to.equal(4);
+
+					// test lines
+					expect(lines).to.have.lengthOf(4);
+
+					EOLCount = 0;
+
+					lines.forEach((line) => {
+						!line && EOLCount++;
+					});
+
+					expect(EOLCount).to.equal(0);
+
+					done();
+				});
+			});
 		});
 
 		describe('Event: \'line/err\'', () => {
@@ -192,6 +237,51 @@ module.exports = () => {
 					});
 
 					expect(stderrBuffer.trimRight().split('\n')).to.eql(errLines);
+					done();
+				});
+			});
+
+			it('discards empty lines', (done) => {
+				const file = '../helper-processes/error-empty-lines.js';
+
+				const childProc = cwd.spawn(`node ${file}`);
+
+				let stderrBuffer = '';
+				const lines = [];
+
+				childProc.stderr.on('data', (chunk) => {
+					stderrBuffer += chunk;
+				});
+
+				childProc.on('line/err', (line) => {
+					lines.push(line);
+				});
+
+				childProc.on('close', () => {
+					// test the native stderr string for reference
+					const splitBuffer = stderrBuffer.split(EOL);
+
+					expect(splitBuffer).to.have.lengthOf(8);
+
+					let EOLCount = 0;
+
+					splitBuffer.forEach((line) => {
+						!line && EOLCount++;
+					});
+
+					expect(EOLCount).to.equal(4);
+
+					// test lines
+					expect(lines).to.have.lengthOf(4);
+
+					EOLCount = 0;
+
+					lines.forEach((line) => {
+						!line && EOLCount++;
+					});
+
+					expect(EOLCount).to.equal(0);
+
 					done();
 				});
 			});
