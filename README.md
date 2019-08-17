@@ -5,6 +5,11 @@ run-in-cwd
 
 Run CLI commands with Node.
 
+## Table Of Contents
+* [Get Started](#get-started)  
+* [API](#instance-api)
+
+
 ## Get Started
 1. Install 
     ```sh
@@ -39,6 +44,12 @@ Run CLI commands with Node.
 
 
 ## Instance API
+
+* [.runCmd](#runcmd-cmd-args-options--)
+* [.spawn](#spawn-cmd-args-options--)
+* [<chil_process>](#child_process)
+* [.runShellCmd](#runShellCmd-cmd-args-options--)
+* [.spawnShell](#spawnshell-cmd-args-options--)
 
 ------------------------------------------------------------
 ### **.runCmd(** cmd, [args, [options] ] **)**
@@ -153,11 +164,7 @@ const childProc = cwd.spawn('git status')
 // and also:
 const childProc = cwd.spawnShell('git add -A && git commit')
 ```
-
-------------------------------------------------------------
-### **.spawnShell(** cmd, [args, [options] ] **)**
-------------------------------------------------------------
-Is the same as `.spawn()` but with the `{shell: true}` option.
+&nbsp;
 
 &nbsp;
 
@@ -201,6 +208,17 @@ childProc.on('close', (exitCode) => {
 
 &nbsp;
 
+
+------------------------------------------------------------
+### **.runShellCmd(** cmd, [args, [options] ] **)**
+### **.spawnShell(** cmd, [args, [options] ] **)**
+------------------------------------------------------------
+Those are the shelled versions of `.spawn()` and `.runcCmd()`, respectivly. Meaning, the option `{shell: true}` is used. Use the shelled versions when you need to chain commands, for example: 
+```js
+cwd.runShellCmd('git add -A && git commit -m "nice feature" && git push')
+```
+
+&nbsp;
 
 
 
