@@ -21,7 +21,7 @@ async function getFiles () {
 (async () => {
 	try {
 		// const cp = cwd.spawn('  ls ', ['../'], {stdio: 'pipe'})
-		const cp = cwd.runCmd('  ls ', ['./'], {stdio: 'pipe'})
+		const cp = cwd.runCmd('  ls ', ['./'], {stdio: 'inherit'})
 
 		cp.then((p) => {
 			console.log('p', p);
