@@ -22,7 +22,6 @@ module.exports = function runCmd (cmdStr, ...rest) {
 		});
 
 		let stdOutBufferSize = 0;
-
 		childProc.stdout && childProc.stdout.on('data', (chunk) => {
 			const chunkSize = Buffer.byteLength(chunk, 'utf8');
 
@@ -36,7 +35,6 @@ module.exports = function runCmd (cmdStr, ...rest) {
 		});
 
 		let stdErrBufferSize = 0;
-
 		childProc.stderr && childProc.stderr.on('data', (chunk) => {
 			const chunkSize = Buffer.byteLength(chunk, 'utf8');
 
@@ -49,13 +47,11 @@ module.exports = function runCmd (cmdStr, ...rest) {
 		});
 
 		const stdoutLines = [];
-
 		childProc.on('line/out', (line) => {
 			stdoutLines.push(line);
 		});
 
 		const stderrLines = [];
-
 		childProc.on('line/err', (line) => {
 			stderrLines.push(line);
 		});
