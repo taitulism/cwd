@@ -22,8 +22,7 @@ module.exports = function runCmd (cmdStr, ...rest) {
 		});
 
 		let stdOutBufferSize = 0;
-
-		childProc.stdout.on('data', (chunk) => {
+		childProc.stdout && childProc.stdout.on('data', (chunk) => {
 			const chunkSize = Buffer.byteLength(chunk, 'utf8');
 
 			stdOutBufferSize += chunkSize;
@@ -36,8 +35,7 @@ module.exports = function runCmd (cmdStr, ...rest) {
 		});
 
 		let stdErrBufferSize = 0;
-
-		childProc.stderr.on('data', (chunk) => {
+		childProc.stderr && childProc.stderr.on('data', (chunk) => {
 			const chunkSize = Buffer.byteLength(chunk, 'utf8');
 
 			stdErrBufferSize += chunkSize;
@@ -49,27 +47,26 @@ module.exports = function runCmd (cmdStr, ...rest) {
 		});
 
 		const stdoutLines = [];
-
-		childProc.on('stdOut', (lines) => {
-			stdoutLines.push(...lines);
+		childProc.on('line/out', (line) => {
+			stdoutLines.push(line);
 		});
 
 		const stderrLines = [];
-
-		childProc.on('stdErr', (lines) => {
-			stderrLines.push(...lines);
+		childProc.on('line/err', (line) => {
+			stderrLines.push(line);
 		});
 
 		childProc.on('close', (exitCode) => {
 			if (exception) return reject(exception);
 
-			const resultArray = [exitCode === 0, stderrLines, stdoutLines];
-
-			resultArray.exitCode = exitCode;
-			resultArray.stderr = stderrLines.join('\n');
-			resultArray.stdout = stdoutLines.join('\n');
-
-			return resolve(resultArray);
+			return resolve({
+				exitCode,
+				isOk: exitCode === 0,
+				stdout: stdoutLines.join('\n'),
+				stderr: stderrLines.join('\n'),
+				stdoutLines,
+				stderrLines,
+			});
 		});
 	});
 };

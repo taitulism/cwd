@@ -16,100 +16,108 @@ module.exports = () => {
 	});
 
 	describe('When command is legit (e.g. `ls`)', () => {
-		it('returns an array', async () => {
-			const returnValue = await cwd.runCmd('ls');
+		it('returns a promise', () => {
+			const promise = cwd.runCmd('ls');
 
-			expect(returnValue).to.be.an('array');
+			expect(promise).to.be.instanceOf(Promise);
 		});
 
-		describe('Returned Array', () => {
-			describe('[0] isOk', () => {
-				it('is true when exit code is 0', async () => {
-					const [returnValue] = await cwd.runCmd('ls');
+		it('that resolves with an object', () => (
+			expect(cwd.runCmd('ls')).to.eventually.be.an('object')
+		));
 
-					expect(returnValue).to.be.true;
+		describe('Returned Object Props', () => {
+			describe('.exitCode', () => {
+				it('Number', async () => {
+					const {exitCode} = await cwd.runCmd('ls');
+
+					expect(exitCode).to.be.a('number');
+				});
+
+				it('equal 0 when everything is ok', async () => {
+					const {exitCode} = await cwd.runCmd('ls');
+
+					expect(exitCode).to.equal(0);
+				});
+
+				it('is not 0 when something went wrong', async () => {
+					const {exitCode} = await cwd.runCmd('ls', ['./bla']);
+
+					expect(exitCode).to.not.equal(0);
+				});
+			});
+
+			describe('.isOk', () => {
+				it('is true when exit code is 0', async () => {
+					const {isOk} = await cwd.runCmd('ls');
+
+					expect(isOk).to.be.true;
 				});
 
 				it('is false when exit code is NOT 0', async () => {
-					const [returnValue] = await cwd.runCmd('ls', ['./bla']);
+					const {isOk} = await cwd.runCmd('ls', ['./bla']);
 
-					expect(returnValue).to.be.false;
+					expect(isOk).to.be.false;
 				});
 			});
 
-			describe('[1] process.stderr', () => {
-				it('is an array', async () => {
-					const [, returnValue] = await cwd.runCmd('ls', ['./bla']);
+			describe('.stderr', () => {
+				it('String', async () => {
+					const {stderr} = await cwd.runCmd('ls');
 
-					expect(returnValue).to.be.an('array');
+					expect(stderr).to.be.a('string');
 				});
 
 				it('is the command errors', async () => {
-					const [, returnValue] = await cwd.runCmd('ls', ['./bla']);
+					const {stderr} = await cwd.runCmd('ls', ['./bla']);
 
-					expect(returnValue[0]).to.have.string('No such file or directory');
+					expect(stderr).to.have.string('No such file or directory');
 				});
 			});
 
-			describe('[2] process.stdout', () => {
-				it('is an array', async () => {
-					const [,, returnValue] = await cwd.runCmd('ls');
+			describe('.stdout', () => {
+				it('String', async () => {
+					const {stdout} = await cwd.runCmd('ls');
 
-					expect(returnValue).to.be.an('array');
+					expect(stdout).to.be.a('string');
 				});
 
 				it('is the command output', async () => {
-					const [,, returnValue] = await cwd.runCmd('ls');
+					const {stdout} = await cwd.runCmd('ls');
 
-					expect(returnValue).to.include('aaa')
+					expect(stdout).to.include('aaa')
 						.and.include('bbb')
 						.and.include('ccc');
 				});
 			});
 
-			describe('Other Props', () => {
-				describe('.exitCode', () => {
-					it('is a number', async () => {
-						const {exitCode} = await cwd.runCmd('ls');
+			describe('.stderrLines', () => {
+				it('Array', async () => {
+					const {stderrLines} = await cwd.runCmd('ls', ['./bla']);
 
-						expect(exitCode).to.be.a('number');
-					});
-
-					it('equal 0 when everything is ok', async () => {
-						const {exitCode} = await cwd.runCmd('ls');
-
-						expect(exitCode).to.equal(0);
-					});
+					expect(stderrLines).to.be.an('array');
 				});
 
-				describe('.stderr', () => {
-					it('is a string', async () => {
-						const {stderr} = await cwd.runCmd('ls');
+				it('is the command stderr split into lines', async () => {
+					const {stderrLines} = await cwd.runCmd('ls', ['./bla']);
 
-						expect(stderr).to.be.a('string');
-					});
+					expect(stderrLines[0]).to.have.string('No such file or directory');
+				});
+			});
 
-					it('is the command errors', async () => {
-						const {stderr} = await cwd.runCmd('ls', ['./bla']);
+			describe('.stdoutLines', () => {
+				it('Array', async () => {
+					const {stdoutLines} = await cwd.runCmd('ls');
 
-						expect(stderr).to.have.string('No such file or directory');
-					});
+					expect(stdoutLines).to.be.an('array');
 				});
 
-				describe('.stdout', () => {
-					it('is a string', async () => {
-						const {stdout} = await cwd.runCmd('ls');
+				it('is the command stdout split into lines', async () => {
+					const {stdoutLines} = await cwd.runCmd('ls');
 
-						expect(stdout).to.be.a('string');
-					});
-
-					it('is the command output', async () => {
-						const {stdout} = await cwd.runCmd('ls');
-
-						expect(stdout).to.include('aaa')
-							.and.include('bbb')
-							.and.include('ccc');
-					});
+					expect(stdoutLines).to.include('aaa')
+						.and.include('bbb')
+						.and.include('ccc');
 				});
 			});
 		});
@@ -131,9 +139,9 @@ module.exports = () => {
 		it('doesn\'t throw when NOT exceeded', async () => {
 			try {
 				const file = 'max-buffer-out.js';
-				const [,, out] = await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES]);
+				const {stdout} = await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES]);
 
-				expect(out).to.be.ok;
+				expect(stdout).to.be.ok;
 			}
 			catch (ex) {
 				expect(true).to.be.false;
@@ -141,9 +149,9 @@ module.exports = () => {
 
 			try {
 				const file = 'max-buffer-err.js';
-				const [, err] = await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES]);
+				const {stderr} = await cwd.runCmd(`node ${file}`, [FIVE_MEGABYTES]);
 
-				expect(err).to.be.ok;
+				expect(stderr).to.be.ok;
 			}
 			catch (ex) {
 				expect(true).to.be.false;

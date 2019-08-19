@@ -1,13 +1,8 @@
-const LINE = 'line';
-const DATA = 'data';
 const STDOUT = 'stdout';
 const STDERR = 'stderr';
-const STDOUT_EVENT_NAME = 'stdOut';
-const STDERR_EVENT_NAME = 'stdErr';
-const STDOUT_LINE_EVENT_NAME = 'line/out';
-const STDERR_LINE_EVENT_NAME = 'line/err';
-const STDOUT_FLAGNAME = 'hasData';
-const STDERR_FLAGNAME = 'hasErrors';
+const LINE_EVENT = 'line';
+const STDOUT_LINE_EVENT = 'line/out';
+const STDERR_LINE_EVENT = 'line/err';
 
 module.exports = {
 	beforeClose (cp) {
@@ -25,13 +20,13 @@ module.exports = {
 
 	emitLastLines (cp) {
 		if (cp.stdout && cp.stdout.lineBuffer) {
-			cp.emit(LINE, cp.stdout.lineBuffer);
-			cp.emit(STDOUT_EVENT_NAME, [cp.stdout.lineBuffer]);
+			cp.emit(STDOUT_LINE_EVENT, cp.stdout.lineBuffer);
+			cp.emit(LINE_EVENT, cp.stdout.lineBuffer);
 		}
 
 		if (cp.stderr && cp.stderr.lineBuffer) {
-			cp.emit(LINE, cp.stdout.lineBuffer);
-			cp.emit(STDERR_EVENT_NAME, [cp.stderr.lineBuffer]);
+			cp.emit(STDERR_LINE_EVENT, cp.stderr.lineBuffer);
+			cp.emit(LINE_EVENT, cp.stderr.lineBuffer);
 		}
 	},
 
@@ -42,49 +37,26 @@ module.exports = {
 };
 
 function registerLineEvent (cp, channel) {
-	let eventName, lineEventName, flagName;
-
-	if (channel === STDOUT) {
-		eventName = STDOUT_EVENT_NAME;
-		lineEventName = STDOUT_LINE_EVENT_NAME;
-		flagName = STDOUT_FLAGNAME;
-	}
-	else if (channel === STDERR) {
-		eventName = STDERR_EVENT_NAME;
-		lineEventName = STDERR_LINE_EVENT_NAME;
-		flagName = STDERR_FLAGNAME;
-	}
-	// else {
-	//     TODO:
-	// }
-
-	cp[flagName] = false;
-
-	cp[channel].once(DATA, () => {
-		cp[flagName] = true;
-	});
+	const channelLineEventName = (channel === STDOUT)
+		? STDOUT_LINE_EVENT
+		: STDERR_LINE_EVENT;
 
 	cp[channel].lineBuffer = '';
 
-	cp[channel].setEncoding('utf8').on(DATA, (chunk) => {
+	cp[channel].setEncoding('utf8').on('data', (chunk) => {
 		cp[channel].lineBuffer += chunk;
 
 		const lines = cp[channel].lineBuffer.split(/\r?\n/u);
 
 		if (!lines.length) return;
 
-		const lastLine = lines.pop();
-
-		cp[channel].lineBuffer = lastLine;
+		cp[channel].lineBuffer = lines.pop(); // last line
 
 		lines.forEach((line) => {
-			cp.emit(lineEventName, line);
+			if (!line) return;
 
-			if (line) {
-				cp.emit(LINE, line);
-			}
+			cp.emit(channelLineEventName, line);
+			cp.emit(LINE_EVENT, line);
 		});
-
-		cp.emit(eventName, lines);
 	});
 }
