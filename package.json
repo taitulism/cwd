@@ -1,6 +1,6 @@
 {
 	"name": "run-in-cwd",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"description": "Run CLI commands with Node",
 	"keywords": [
 		"spawn",
