@@ -3,8 +3,8 @@ const spawnShell = require('./spawn-shell');
 const runCmd = require('./run-command');
 const runShellCmd = require('./run-shell-command');
 
-function Cwd (dirPath) {
-	if (!dirPath || typeof dirPath !== 'string') {
+function Cwd (dirPath = './') {
+	if (typeof dirPath !== 'string') {
 		throw new Error('Cwd expects one argument <String>, a path to a directory.');
 	}
 
