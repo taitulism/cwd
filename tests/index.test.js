@@ -8,6 +8,7 @@ const {TEST_DIR} = require('./constants');
 const createCwd = require('../');
 
 describe('\r===========\n-  C W D  -\n===========', () => {
+	describe('Exports', require('./export'));
 	describe('Creation', require('./creation'));
 
 	describe('Instance', () => {
