@@ -5,14 +5,14 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const {TEST_DIR} = require('./constants');
-const Cwd = require('../');
+const createCwd = require('../');
 
 describe('\r===========\n-  C W D  -\n===========', () => {
 	describe('Creation', require('./creation'));
 
 	describe('Instance', () => {
 		describe('API / Reference', () => {
-			const cwdInstance = new Cwd(TEST_DIR);
+			const cwdInstance = createCwd(TEST_DIR);
 
 			it('.spawn(cmd, args, opts)', () => {
 				expect(cwdInstance.spawn).to.be.a('function');

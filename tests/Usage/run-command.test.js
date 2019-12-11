@@ -2,13 +2,13 @@ const {expect} = require('chai');
 
 const {TEST_DIR} = require('../constants');
 const errors = require('../../src/private-methods/errors');
-const Cwd = require('../..');
+const createCwd = require('../..');
 
 module.exports = () => {
 	let cwd;
 
 	beforeEach(() => {
-		cwd = new Cwd(TEST_DIR);
+		cwd = createCwd(TEST_DIR);
 	});
 
 	afterEach(() => {
@@ -127,7 +127,7 @@ module.exports = () => {
 		let cwd;
 
 		beforeEach(() => {
-			cwd = new Cwd('./tests/helper-processes');
+			cwd = createCwd('./tests/helper-processes');
 		});
 
 		afterEach(() => {

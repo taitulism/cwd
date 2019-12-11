@@ -5,13 +5,13 @@ const {expect} = require('chai');
 
 const {TEST_DIR, OTHER_TEST_DIR} = require('../constants');
 const errors = require('../../src/private-methods/errors');
-const Cwd = require('../..');
+const createCwd = require('../..');
 
 module.exports = () => {
 	let cwd;
 
 	beforeEach(() => {
-		cwd = new Cwd(TEST_DIR);
+		cwd = createCwd(TEST_DIR);
 	});
 
 	afterEach(() => {
@@ -488,7 +488,7 @@ module.exports = () => {
 
 	describe('When cwd doesn\'t exist (e.g. ``)', () => {
 		it('emits an error event', (done) => {
-			const cwd = new Cwd('../not/exist');
+			const cwd = createCwd('../not/exist');
 
 			cwd.spawn('ls').on('error', (err) => {
 				expect(err).to.be.an.instanceof(Error);

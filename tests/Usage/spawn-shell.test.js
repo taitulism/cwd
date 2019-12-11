@@ -2,13 +2,13 @@ const {expect} = require('chai');
 const sinon = require('sinon');
 
 const {TEST_DIR} = require('../constants');
-const Cwd = require('../..');
+const createCwd = require('../..');
 
 module.exports = () => {
 	let cwd;
 
 	beforeEach(() => {
-		cwd = new Cwd(TEST_DIR);
+		cwd = createCwd(TEST_DIR);
 	});
 
 	afterEach(() => {
