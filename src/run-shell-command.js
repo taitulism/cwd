@@ -1,9 +1,7 @@
 const resolveArgs = require('./private-methods/resolve-args');
-const parseCmd = require('./private-methods/parse-command');
 
 module.exports = function runShellCmd (...args) {
-	const [rawCmd, rawCmdArgs, options] = resolveArgs(...args);
-	const [cmd, cmdArgs] = parseCmd(rawCmd, rawCmdArgs);
+	const [cmd, cmdArgs, options] = resolveArgs(...args);
 
 	if (!options.shell) {
 		options.shell = true;

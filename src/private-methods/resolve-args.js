@@ -4,7 +4,7 @@ const {CmdIsNotString, CmdIsEmptyString} = require('./errors');
 module.exports = function resolveArgs (rawCmd, maybeArgs, maybeOptions) {
 	validateCommand(rawCmd);
 
-	const [cmd, rawArgs] = parseCmd(rawCmd);
+	const [cmd, rawArgs] = extractArgsFromCmd(rawCmd);
 
 	const [additionalArgs, options] = normalizeArgs(maybeArgs, maybeOptions);
 
@@ -19,7 +19,7 @@ function validateCommand (rawCmd) {
 	if (rawCmd.length === 0) throw new Error(CmdIsEmptyString);
 }
 
-function parseCmd (rawCmd) {
+function extractArgsFromCmd (rawCmd) {
 	let cmd, cmdArgs;
 
 	cmd = rawCmd.trim();
