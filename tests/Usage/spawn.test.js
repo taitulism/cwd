@@ -452,6 +452,16 @@ module.exports = () => {
 
 	describe('When called with a command argument that is string', () => {
 		it('works', (done) => {
+			const file = '../helper-processes/return-called-with.js';
+
+			cwd.spawn('node', file)
+				.on('line', (line) => {
+					expect(line).to.equal('NONE');
+					done();
+				});
+		});
+
+		it('works', (done) => {
 			const MY_ARG = 'myArg';
 			const file = '../helper-processes/return-called-with.js';
 
