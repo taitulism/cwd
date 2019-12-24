@@ -22,9 +22,10 @@ module.exports = () => {
 			try {
 				await cwd.runShellCmd('ls');
 				expect(spy.callCount).to.equal(1);
-				expect(spy.firstCall.args).to.have.lengthOf(3);
+				expect(spy.firstCall.args).to.have.lengthOf(4);
 				expect(spy.firstCall.args[2]).to.be.an('object');
 				expect(spy.firstCall.args[2].shell).to.be.true;
+				expect(spy.firstCall.args[3]).to.be.true;
 				spy.restore();
 			}
 			catch (ex) {

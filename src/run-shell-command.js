@@ -7,5 +7,5 @@ module.exports = function runShellCmd (...args) {
 		options.shell = true;
 	}
 
-	return this.runCmd(cmd, cmdArgs, options);
+	return this.runCmd(cmd, cmdArgs, options, true);
 };

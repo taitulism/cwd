@@ -1,7 +1,14 @@
 const normalizeArgs = require('./normalize-arguments');
 const {CmdIsNotString, CmdIsEmptyString} = require('./errors');
 
-module.exports = function resolveArgs (rawCmd, maybeArgs, maybeOptions) {
+module.exports = function resolveArgs (
+	rawCmd,
+	maybeArgs,
+	maybeOptions,
+	argsResolved = false,
+) {
+	if (argsResolved) return [rawCmd, maybeArgs, maybeOptions];
+
 	validateCommand(rawCmd);
 
 	const [cmd, rawArgs] = extractArgsFromCmd(rawCmd);
