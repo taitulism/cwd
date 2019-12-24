@@ -62,10 +62,14 @@ module.exports = function runCmd (...args) {
 			return resolve({
 				exitCode,
 				isOk: exitCode === 0,
-				stdout: stdoutLines.join('\n'),
-				stderr: stderrLines.join('\n'),
 				stdoutLines,
 				stderrLines,
+				get stdout () {
+					return stdoutLines.join('\n');
+				},
+				get stderr () {
+					return stderrLines.join('\n');
+				},
 			});
 		});
 	});
