@@ -29,5 +29,20 @@ module.exports = () => {
 				done();
 			});
 		});
+
+		it('handles shell characters', (done) => {
+			const childProc = cwd.spawnShell('echo A && echo B && echo C');
+			const lineOutArray = [];
+			const expectedArray = ['A', 'B', 'C'];
+
+			childProc.on('line/out', (line) => {
+				lineOutArray.push(line);
+			});
+
+			childProc.on('close', () => {
+				expect(lineOutArray).to.eql(expectedArray);
+				done();
+			});
+		});
 	});
 };
