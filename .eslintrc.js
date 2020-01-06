@@ -104,7 +104,7 @@ module.exports = {
 		"max-statements": ["warn", { "max": 16 }],
 		"max-statements-per-line": "error",
 //	  "multiline-comment-style": "off",
-		"multiline-ternary": "error",
+//    "multiline-ternary": "off",
 		"new-cap": ["error", {
 			"capIsNew": false,
 		}],

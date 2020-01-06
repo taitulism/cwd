@@ -7,6 +7,7 @@ module.exports = function spawn (...args) {
 	const [cmd, cmdArgs, options] = resolveArgs(...args);
 
 	options.cwd = options.cwd || this.dirPath;
+	options.stdio = options.stdio || this.stdio;
 
 	const cp = nativeSpawn(cmd, cmdArgs, options);
 

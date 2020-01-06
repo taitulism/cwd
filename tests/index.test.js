@@ -6,6 +6,7 @@ chai.use(chaiAsPromised);
 
 const {TEST_DIR} = require('./constants');
 const createCwd = require('../');
+const Cwd = require('../src/Cwd');
 
 describe('\r===========\n-  C W D  -\n===========', () => {
 	describe('Exports', require('./export'));
@@ -29,6 +30,38 @@ describe('\r===========\n-  C W D  -\n===========', () => {
 
 			it('.runShellCmd(cmd, args, opts)', () => {
 				expect(cwdInstance.runShellCmd).to.be.a('function');
+			});
+
+			describe('[getter] .parent', () => {
+				it('returns a Cwd Instance with stdio option', () => {
+					expect(cwdInstance.stdio).to.be.null;
+					expect(cwdInstance.parentProcess instanceof Cwd).to.be.true;
+					expect(cwdInstance.parentProcess.stdio).to.equal('inherit');
+				});
+
+				describe('When piping to parent process', () => {
+					it('pipes everything to screen', () => {
+						cwdInstance.parentProcess.spawn('echo 1/4 OK');
+					});
+				});
+
+				describe('When piping to parent process', () => {
+					it('pipes everything to screen', () => {
+						cwdInstance.parentProcess.spawnShell('echo 2/4 OK');
+					});
+				});
+
+				describe('When piping to parent process', () => {
+					it('pipes everything to screen', () => {
+						cwdInstance.parentProcess.runCmd('echo 3/4 OK');
+					});
+				});
+
+				describe('When piping to parent process', () => {
+					it('pipes everything to screen', () => {
+						cwdInstance.parentProcess.runShellCmd('echo 4/4 OK');
+					});
+				});
 			});
 		});
 

@@ -6,7 +6,7 @@ const Cwd = require('..');
 
 const DIR = __dirname;
 
-const cwd = new Cwd(DIR);
+const cwd = Cwd(DIR);
 
 
 async function getFiles () {
@@ -21,7 +21,8 @@ async function getFiles () {
 (async () => {
 	try {
 		// const cp = cwd.spawn('  ls ', ['../'], {stdio: 'pipe'})
-		const cp = cwd.runCmd('  ls ', ['./'], {stdio: 'inherit'})
+		// const cp = cwd.runCmd('  ls ', ['./'], {stdio: 'inherit'})
+		const cp = cwd.parentProcess.runCmd('echo hi')
 
 		cp.then((p) => {
 			console.log('p', p);
