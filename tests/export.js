@@ -1,6 +1,7 @@
 const {expect} = require('chai');
 
 const createCwd = require('..');
+const Cwd = require('../src/Cwd');
 
 module.exports = () => {
 	it('is a function', () => {
@@ -38,15 +39,21 @@ module.exports = () => {
 	});
 
 	describe('Default Parent Instance', () => {
+		it('returns a Cwd Instance with stdio option', () => {
+			expect(createCwd.stdio).to.be.null;
+			expect(createCwd.parentProcess instanceof Cwd).to.be.true;
+			expect(createCwd.parentProcess.stdio).to.equal('inherit');
+		});
+
 		it('has instance methods', () => {
-			expect(createCwd.parent.spawn).to.be.a('function');
-			expect(createCwd.parent.spawnShell).to.be.a('function');
-			expect(createCwd.parent.runCmd).to.be.a('function');
-			expect(createCwd.parent.runShellCmd).to.be.a('function');
+			expect(createCwd.parentProcess.spawn).to.be.a('function');
+			expect(createCwd.parentProcess.spawnShell).to.be.a('function');
+			expect(createCwd.parentProcess.runCmd).to.be.a('function');
+			expect(createCwd.parentProcess.runShellCmd).to.be.a('function');
 		});
 
 		it('redirects input & output to the parent process', async () => {
-			const {isOk} = await createCwd.parent.runCmd('ls');
+			const {isOk} = await createCwd.parentProcess.runCmd('echo 1/5 OK');
 
 			expect(isOk).to.be.true;
 		});

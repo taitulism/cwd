@@ -41,25 +41,25 @@ describe('\r===========\n-  C W D  -\n===========', () => {
 
 				describe('When piping to parent process', () => {
 					it('pipes everything to screen', () => {
-						cwdInstance.parentProcess.spawn('echo 1/4 OK');
+						cwdInstance.parentProcess.spawn('echo 2/5 OK');
 					});
 				});
 
 				describe('When piping to parent process', () => {
 					it('pipes everything to screen', () => {
-						cwdInstance.parentProcess.spawnShell('echo 2/4 OK');
+						cwdInstance.parentProcess.spawnShell('echo 3/5 OK');
 					});
 				});
 
 				describe('When piping to parent process', () => {
 					it('pipes everything to screen', () => {
-						cwdInstance.parentProcess.runCmd('echo 3/4 OK');
+						cwdInstance.parentProcess.runCmd('echo 4/5 OK');
 					});
 				});
 
 				describe('When piping to parent process', () => {
 					it('pipes everything to screen', () => {
-						cwdInstance.parentProcess.runShellCmd('echo 4/4 OK');
+						cwdInstance.parentProcess.runShellCmd('echo 5/5 OK');
 					});
 				});
 			});
