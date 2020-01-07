@@ -68,7 +68,7 @@ module.exports = () => {
 					expect(stderr).to.be.a('string');
 				});
 
-				it('is the command errors', async () => {
+				it('is the command stderr', async () => {
 					const {stderr} = await cwd.runCmd('ls', ['./bla']);
 
 					expect(stderr).to.have.string('No such file or directory');
@@ -82,12 +82,31 @@ module.exports = () => {
 					expect(stdout).to.be.a('string');
 				});
 
-				it('is the command output', async () => {
+				it('is the command stdout', async () => {
 					const {stdout} = await cwd.runCmd('ls');
 
 					expect(stdout).to.include('aaa')
 						.and.include('bbb')
 						.and.include('ccc');
+				});
+			});
+
+			describe('.output', () => {
+				it('String', async () => {
+					const file = '../helper-processes/out-and-err.js';
+					const {output} = await cwd.runCmd(`node ${file}`);
+
+					expect(output).to.be.a('string');
+				});
+
+				it('is the command output (both stdout & stderr)', async () => {
+					const file = '../helper-processes/out-and-err.js';
+					const {output} = await cwd.runCmd(`node ${file}`);
+
+					expect(output).to.include('out 1')
+						.and.include('out 2')
+						.and.include('err 1')
+						.and.include('err 2');
 				});
 			});
 
@@ -118,6 +137,25 @@ module.exports = () => {
 					expect(stdoutLines).to.include('aaa')
 						.and.include('bbb')
 						.and.include('ccc');
+				});
+			});
+
+			describe('.lines', () => {
+				it('Array', async () => {
+					const file = '../helper-processes/out-and-err.js';
+					const {lines} = await cwd.runCmd(`node ${file}`);
+
+					expect(lines).to.be.an('array');
+				});
+
+				it('is the command stdout split into lines', async () => {
+					const file = '../helper-processes/out-and-err.js';
+					const {lines} = await cwd.runCmd(`node ${file}`);
+
+					expect(lines).to.include('out 1')
+						.and.include('out 2')
+						.and.include('err 1')
+						.and.include('err 2');
 				});
 			});
 		});

@@ -1,4 +1,4 @@
-/* eslint-disable max-lines-per-function */
+/* eslint-disable max-lines-per-function, max-statements */
 
 // eslint-disable-next-line no-magic-numbers
 const maxBuffer = 1024 * 1024 * 5; // ~5MB
@@ -56,6 +56,11 @@ module.exports = function runCmd (...args) {
 			stderrLines.push(line);
 		});
 
+		const lines = [];
+		childProc.on('line', (line) => {
+			lines.push(line);
+		});
+
 		childProc.on('close', (exitCode) => {
 			if (exception) return reject(exception);
 
@@ -64,11 +69,15 @@ module.exports = function runCmd (...args) {
 				isOk: exitCode === 0,
 				stdoutLines,
 				stderrLines,
+				lines,
 				get stdout () {
 					return stdoutLines.join('\n');
 				},
 				get stderr () {
 					return stderrLines.join('\n');
+				},
+				get output () {
+					return lines.join('\n');
 				},
 			});
 		});
