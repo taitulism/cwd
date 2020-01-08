@@ -1,16 +1,29 @@
 /* eslint-disable max-lines-per-function, max-statements */
 
+const resolveArgs = require('./private-methods/resolve-args');
+
+const DEFAULT_MAX_CACHE = 10; // ~10MB
+
 // eslint-disable-next-line no-magic-numbers
-const maxBuffer = 1024 * 1024 * 5; // ~5MB
+const MB2Bytes = mb => mb * 1024 * 1024;
+
+function resolveCacheSize (mb) {
+	return (typeof mb === 'number' && mb >= 0)
+		? MB2Bytes(mb)
+		: MB2Bytes(DEFAULT_MAX_CACHE);
+}
 
 module.exports = function runCmd (...args) {
+	const [cmd, cmdArgs, options] = resolveArgs(...args);
+	const maxCacheSize = resolveCacheSize(options.maxCacheSize);
+
 	// eslint-disable-next-line consistent-return
 	return new Promise((resolve, reject) => {
 		let exception = null;
 		let childProc;
 
 		try {
-			childProc = this.spawn(...args);
+			childProc = this.spawn(cmd, cmdArgs, options, true);
 		}
 		catch (ex) {
 			return reject(ex);
@@ -27,7 +40,7 @@ module.exports = function runCmd (...args) {
 
 			stdOutBufferSize += chunkSize;
 
-			if (stdOutBufferSize > maxBuffer) {
+			if (stdOutBufferSize > maxCacheSize) {
 				exception = new Error('Cwd.runCmd(): Max buffer size exceeded [stdout].');
 
 				childProc.kill();
@@ -40,7 +53,7 @@ module.exports = function runCmd (...args) {
 
 			stdErrBufferSize += chunkSize;
 
-			if (stdErrBufferSize > maxBuffer) {
+			if (stdErrBufferSize > maxCacheSize) {
 				exception = new Error('Cwd.runCmd(): Max buffer size exceeded [stderr].');
 				childProc.kill();
 			}
