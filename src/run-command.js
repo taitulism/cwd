@@ -34,26 +34,23 @@ module.exports = function runCmd (...args) {
 			childProc.kill();
 		});
 
-		let stdOutBufferSize = 0;
+		let bufferSize = 0;
+
 		childProc.stdout && childProc.stdout.on('data', (chunk) => {
 			const chunkSize = Buffer.byteLength(chunk, 'utf8');
+			bufferSize += chunkSize;
 
-			stdOutBufferSize += chunkSize;
-
-			if (stdOutBufferSize > maxCacheSize) {
+			if (bufferSize > maxCacheSize) {
 				exception = new Error('Cwd.runCmd(): Max buffer size exceeded [stdout].');
-
 				childProc.kill();
 			}
 		});
 
-		let stdErrBufferSize = 0;
 		childProc.stderr && childProc.stderr.on('data', (chunk) => {
 			const chunkSize = Buffer.byteLength(chunk, 'utf8');
+			bufferSize += chunkSize;
 
-			stdErrBufferSize += chunkSize;
-
-			if (stdErrBufferSize > maxCacheSize) {
+			if (bufferSize > maxCacheSize) {
 				exception = new Error('Cwd.runCmd(): Max buffer size exceeded [stderr].');
 				childProc.kill();
 			}

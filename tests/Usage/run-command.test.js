@@ -176,18 +176,6 @@ module.exports = () => {
 		const TEN_MEGABYTES = ONE_MEGABYTE * 10;
 
 		describe('options.maxCache', () => {
-			it('throws when exceeded', async () => {
-				try {
-					const file = 'max-buffer-out.js';
-					await cwd.runCmd(`node ${file} ${ONE_MEGABYTE + 1}`, {maxCacheSize: 1});
-
-					expect(false).to.be.true;
-				}
-				catch (ex) {
-					expect(ex.message).to.have.string('buffer size exceeded');
-				}
-			}).slow(1000).timeout(10000);
-
 			it('doesn\'t throw when not exceeded', async () => {
 				try {
 					const file = 'max-buffer-out.js';
@@ -196,13 +184,50 @@ module.exports = () => {
 					expect(stdout).to.be.ok;
 				}
 				catch (ex) {
+					expect(ex).to.be.null;
+				}
+
+			}).slow(1000).timeout(10000);
+
+			it('throws when exceeded', async () => {
+				try {
+					const file = 'max-buffer-out.js';
+					await cwd.runCmd(`node ${file} ${ONE_MEGABYTE + 1}`, {maxCacheSize: 1});
+
 					expect(true).to.be.false;
+				}
+				catch (ex) {
+					expect(ex.message).to.have.string('buffer size exceeded');
+				}
+			}).slow(1000).timeout(10000);
+
+			it('counts both streams', async () => {
+				try {
+					const file = 'max-buffer-out-and-err.js';
+					const {stdout, stderr} = await cwd.runCmd(`node ${file} ${ONE_MEGABYTE}`, {maxCacheSize: 1});
+
+					expect(stdout).to.be.ok;
+					expect(stderr).to.be.ok;
+				}
+				catch (ex) {
+					expect(ex).to.be.null;
+				}
+
+				try {
+					const file = 'max-buffer-out-and-err.js';
+					await cwd.runCmd(`node ${file} ${ONE_MEGABYTE + 2}`, {maxCacheSize: 1});
+
+					expect(true).to.be.false;
+				}
+				catch (ex) {
+					expect(ex.message).to.have.string('buffer size exceeded');
 				}
 
 				console.log('PLEASE WAIT. The following test takes a few seconds...');
 			}).slow(1000).timeout(10000);
 
 			it('default value is 10MB', async () => {
+				// Pass
 				try {
 					const file = 'max-buffer-out.js';
 					const {stdout} = await cwd.runCmd(`node ${file} ${TEN_MEGABYTES}`);
@@ -210,13 +235,14 @@ module.exports = () => {
 					expect(stdout).to.be.ok;
 				}
 				catch (ex) {
-					expect(true).to.be.false;
+					expect(ex).to.be.null;
 				}
 
+				// Fail
 				try {
 					const file = 'max-buffer-out.js';
 					await cwd.runCmd(`node ${file} ${TEN_MEGABYTES + 1}`);
-					expect(false).to.be.true;
+					expect(true).to.be.false;
 				}
 				catch (ex) {
 					expect(ex.message).to.have.string('buffer size exceeded');
