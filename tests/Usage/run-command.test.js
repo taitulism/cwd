@@ -140,22 +140,22 @@ module.exports = () => {
 				});
 			});
 
-			describe('.lines', () => {
-				it('Array', async () => {
+			describe('.outputLines', () => {
+				it('is the command combined output split into lines', async () => {
 					const file = '../helper-processes/out-and-err.js';
-					const {lines} = await cwd.runCmd(`node ${file}`);
+					const {outputLines} = await cwd.runCmd(`node ${file}`);
 
-					expect(lines).to.be.an('array');
-				});
-
-				it('is the command stdout split into lines', async () => {
-					const file = '../helper-processes/out-and-err.js';
-					const {lines} = await cwd.runCmd(`node ${file}`);
-
-					expect(lines).to.include('out 1')
+					expect(outputLines).to.include('out 1')
 						.and.include('out 2')
 						.and.include('err 1')
 						.and.include('err 2');
+				});
+
+				it('Array', async () => {
+					const file = '../helper-processes/out-and-err.js';
+					const {outputLines} = await cwd.runCmd(`node ${file}`);
+
+					expect(outputLines).to.be.an('array');
 				});
 			});
 		});

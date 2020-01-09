@@ -80,7 +80,7 @@ The promised result is an object with the following properties:
 * **`output`** - String - Both streams' output string (utf-8 encoded).
 * **`stdoutLines`** - Array - The commands's `stdout` output, split to lines.
 * **`stderrLines`** - Array -The commands's `stderr` output, split to lines.
-* **`lines`** - Array - Both streams' output, split to lines.
+* **`outputLines`** - Array - Both streams' output, split to lines.
 
 **Examples:**  
 First, create an instance:

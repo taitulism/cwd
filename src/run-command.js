@@ -66,9 +66,9 @@ module.exports = function runCmd (...args) {
 			stderrLines.push(line);
 		});
 
-		const lines = [];
+		const outputLines = [];
 		childProc.on('line', (line) => {
-			lines.push(line);
+			outputLines.push(line);
 		});
 
 		childProc.on('close', (exitCode) => {
@@ -79,7 +79,7 @@ module.exports = function runCmd (...args) {
 				isOk: exitCode === 0,
 				stdoutLines,
 				stderrLines,
-				lines,
+				outputLines,
 				get stdout () {
 					return stdoutLines.join('\n');
 				},
@@ -87,7 +87,7 @@ module.exports = function runCmd (...args) {
 					return stderrLines.join('\n');
 				},
 				get output () {
-					return lines.join('\n');
+					return outputLines.join('\n');
 				},
 			});
 		});
