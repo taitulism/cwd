@@ -7,40 +7,62 @@ Run CLI commands with Node.
 
 ## Table Of Contents
 * [Get Started](#get-started)  
+* [Default Instance](#default-instance)  
 * [API](#instance-api)
 
 
 ## Get Started
-1. Install 
+1. Install:
     ```sh
     $ npm install run-in-cwd
     ```
-2. Require
+2. Require:
     ```js
-    const Cwd = require('run-in-cwd')
+    const createCwd = require('run-in-cwd')
     ```
-3. Create `Cwd` Instance
+3. Get a `Cwd` Instance:
     ```js
-    const projectDir = new Cwd('./path/to/project/folder')
+    const projectDir = createCwd('/path/to/target/folder')
     ```
-4. Run a command
+4. Run a command:
     ```js
     // run to completion
-    projectDir.runCmd('git status').then(...)
+    projectDir.runCmd('git status').then((results) => {...})
 
     // run with more control
     projectDir.spawn('git status')
         .on('line/out', (line) => {...})
-        .on('error', (err) => {...})
         .on('close', (exitCode) => {...})
     ```
 
 &nbsp;
 
->**WARNING:** If you let your users pass in the command and/or any of its arguments - make sure they are safe and don't forget to handle errors.
+>**WARNING:** If you let your users pass in the command and/or any of its arguments - make sure they are safe.
+
 
 &nbsp;
 
+## Default Instance
+`run-in-cwd` exports a default instance you could use if your target folder is in which the current process runs in. Meaning, what `process.cwd()` returns.
+```js
+const cwd = require('run-in-cwd');
+
+cwd.runCmd('git status').then(...)
+```
+
+It's the same instance you would get if you run `createCwd('./')`
+```js
+const createCwd = require('run-in-cwd');
+const thatFolder = createCwd('./');
+
+cwd.runCmd('git status').then(...)
+```
+
+**NOTE:** Do not extract cwd methods when requiring:
+```js
+// DO NOT:
+const {runCmd} = require('run-in-cwd')
+```
 
 
 ## Instance API
@@ -50,18 +72,20 @@ Run CLI commands with Node.
 * [<child_process>](#child_process)
 * [.runShellCmd](#runShellCmd-cmd-args-options--)
 * [.spawnShell](#spawnshell-cmd-args-options--)
+* [.parentProcess](#parent-process)
+
 
 ------------------------------------------------------------
 ### **.runCmd(** cmd, [args, [options] ] **)**
 ------------------------------------------------------------
-Executes a command and returns a promise when the command exits.  
+Executes a command and returns a promise that resolves when the command exits.  
 Similar to Node's `child_process.exec` and `child_process.execFile` ([see docs](https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback)). 
 
-Take care of errors with `promise.catch()` or a `try-catch` wrapper.
+Don't forget to handle errors with `promise.catch()` or a `try-catch` wrapper.
 
 **Arguments:**
 * **cmd** *(Required)* - A command string (e.g. `'npm'`)
-* **args** - An array of the command's arguments (e.g. `['-flag', 'key=value']`)
+* **args** - An array of the command's arguments (e.g. `['-flag', 'key=value']`). Could also be a string or a number for a single argument.
 * **options** - spawn options object. [See Node's docs](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options).  
 Additional option:
     * `maxCacheSize` - Limit the command cache in MegaBytes. The limit is the total output for both `stdout` & `stderr` streams. Default value is `10`. An exception is thrown when max size is exceeded.  
@@ -137,7 +161,7 @@ An `exception` is thrown when there was a problem with the command **execution**
 ------------------------------------------------------------
 Runs a command and returns a child process with some extra events.
 
-> It is highly recommended to listen to the `'error'` event.
+> It is highly recommended to handle errors:
 ```js
 childProc.on('error', (err) => { /* handle error */ })
 ```
@@ -191,7 +215,7 @@ const childProc = cwd.spawnShell('git add -A && git commit')
 const Cwd = require('run-in-cwd');
 const cwd = new Cwd('./path/to/dir');
 
-const childProc = cwd.spawn('git', ['status']) 
+const childProc = cwd.spawn('git status') 
 
 let isClean = false;
 
@@ -218,36 +242,60 @@ childProc.on('close', (exitCode) => {
 ### **.runShellCmd(** cmd, [args, [options] ] **)**
 ### **.spawnShell(** cmd, [args, [options] ] **)**
 ------------------------------------------------------------
-Those are the shelled versions of `.spawn()` and `.runcCmd()`, respectivly. Meaning, the option `{shell: true}` is used. Use the shelled versions when you need to chain commands, for example: 
+Those are the shelled versions of `.runcCmd()` and `.spawn()`, respectivly. Meaning, the option `{shell: true}` is used. Use the shelled versions when you need to chain commands, redirect I/O, file globbing patterns and other shell behvior.
+
+For example: 
 ```js
-cwd.runShellCmd('git add -A && git commit -m "nice feature" && git push')
+cwd.runShellCmd('git commit -m "nice feature" && git status 1>last-status.txt')
 ```
 
 &nbsp;
 
 
+------------------------------------------------------------
+### **.parentProcess**
+------------------------------------------------------------
+
+Returns a cwd instance that redirects all of its commands' I/O to its parent process. It utilizes Node's `{stdio:inherit}` option. [Read more](https://nodejs.org/api/child_process.html#child_process_options_stdio).
+
+```js
+cwd.parentProcess.runCmd('git status')
+```
+Is the equivalent of:
+```js
+cwd.runCmd('git status', {stdio: 'inherit'})
+```
+
+>**NOTE:** All `cwd` instances (including the default instance) have the `.parentProcess` prop.
+
+When the parent process is Node's global `process` object, it usually means write output to the terminal screen and read input from the keyboard. In this case the above code acts just like running `git status` from the terminal yourself.
+
+
+&nbsp;
+
 
 --------------------------------
 `run-in-cwd` vs. `child_process`
 --------------------------------
-When you need to run multiple commands on the same directory and it's not your *Current Working Directory*, you will find yourself repetitively using spawn's option `{cwd: 'path/to/the/same/dir/every/time'}`.
+When you need to run multiple commands on the same directory and it's not your *Current Working Directory*, you will find yourself repetitively using spawn's option: `{cwd: 'path-to/my-folder'}`. With `CWD` you only do it once.
 
-*With `CWD` you only do it once.*
+Node's child process:
 ```js
 const childProc = require('child_process')
+
+childProc.spawn('git', ['status'], {cwd: '../path-to/my-folder'})
+childProc.spawn('git', ['commit'], {cwd: '../path-to/my-folder'})
+childProc.spawn('git', ['add', '-A'], {cwd: '../path-to/my-folder'})
+```
+
+run-in-cwd:
+```js
 const Cwd = require('run-in-cwd')
+const myFolder = new Cwd('../path-to/my-folder')
 
-// Node's child process
-childProc.spawn('git', ['status'], {cwd: './my-folder'})
-childProc.spawn('git', ['add', '-A'], {cwd: './my-folder'})
-childProc.spawn('git', ['commit'], {cwd: './my-folder'})
-
-// run-in-cwd
-const myFolder = new Cwd('./my-folder')
-
-myFolder.spawn('git', ['status'])
-myFolder.spawn('git', ['add', '-A'])
-myFolder.spawn('git', ['commit'])
+myFolder.spawn('git', 'status')
+myFolder.spawn('git', 'add', '-A')
+myFolder.spawn('git', 'commit')
 ```
 
 &nbsp;
