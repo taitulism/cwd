@@ -9,6 +9,7 @@ Run CLI commands with Node.
 * [Get Started](#get-started)  
 * [Default Instance](#default-instance)  
 * [API](#instance-api)
+* [What is CWD](#what-is-cwd)
 
 
 ## Get Started
@@ -50,13 +51,7 @@ const cwd = require('run-in-cwd');
 cwd.runCmd('git status').then(...)
 ```
 
-It's the same instance you would get if you run `createCwd('./')`
-```js
-const createCwd = require('run-in-cwd');
-const thatFolder = createCwd('./');
-
-cwd.runCmd('git status').then(...)
-```
+It's the same instance you would get if you run `createCwd('./')` or even `createCwd()`
 
 **NOTE:** Do not extract cwd methods when requiring:
 ```js
@@ -91,7 +86,7 @@ Don't forget to handle errors with `promise.catch()` or a `try-catch` wrapper.
 Additional option:
     * `maxCacheSize` - Limit the command cache in MegaBytes. The limit is the total output for both `stdout` & `stderr` streams. Default value is `10`. An exception is thrown when max size is exceeded.  
         ```js
-        myDir.runCmd('cat logFile.txt', {maxCacheSize: 20}) // 20 MB limit
+        cwd.runCmd('cat longFile.txt', {maxCacheSize: 20}) // 20 MB limit
         ```
 
 
@@ -108,15 +103,9 @@ The promised result is an object with the following properties:
 * **`outputLines`** - Array - Both streams' output, split to lines.
 
 **Examples:**  
-First, create an instance:
+Promise style:
 ```js
-const Cwd = require('run-in-cwd');
-const projectDir = new Cwd('./path/to/project');
-```
-
-Use Promise Style:
-```js
-projectDir.runCmd('npm install')
+cwd.runCmd('npm install')
     .then({isOk, stderr} => {
         // ...
     })
@@ -125,7 +114,7 @@ projectDir.runCmd('npm install')
     });
 ```
 
-Use with Async-Await:
+Async-Await style:
 ```js
 (async () => { // `await` only runs inside async functions
     try {
@@ -133,22 +122,20 @@ Use with Async-Await:
 
         // ...
     }
-    catch (ex) {
+    catch (err) {
         // handle exception...
     }
 })();
 ```
 
 
-## The difference between `!isOk` (not ok) and `exception`:
-A CLI command has two output channels it can use to communicate with the process who ran it: one for the command's standard output (`stdout`), and one for its errors (`stderr`).
-It can also utilize an exit code for when it completes. The consensus is exit code `0` for success (a kind of a "200 OK" HTTP response status code) and non-zero otherwise.
-
-Each command can utilize those channels and exit codes differently, even "incorrectly" as there is no standard other than subjective common sense...
+### The difference between `!isOk`, `stderr` and `error`:
+A CLI command creates a process that has two output channels it can use to communicate with its parent process: one for the command's standard output (`stdout`), and one for its errors (`stderr`).
+Every command also finishes with an exit code. The consensus is exit code `0` for success (a kind of an HTTP "200 OK" status code) and non-zero otherwise. Commands can utilize those channels and exit codes differently, even "incorrectly" as there is no standard other than subjective common sense...
 
 So when a command fails it will probably send some details through its `stderr` channel and exit with a non-zero exit code but it **will** be completed. No errors will be thrown in the Node process that executed the command.
 
-An `exception` is thrown when there was a problem with the command **execution** in our environment. For example when the command itself is not found (e.g. a typo like `ggit` instead of `git`) or when the command tries to write stuff but you have no free storage, etc.
+An `exception` is thrown when there was a problem with the command **execution** in our environment. For example when the command itself is not found (e.g. a typo like `ggit`) or for example when a command tries to write stuff but you have no free storage, etc.
 
 &nbsp;
 
@@ -200,9 +187,7 @@ const childProc = cwd.spawn('npm install --save')
 
 
 ```js
-const Cwd = require('run-in-cwd');
-const cwd = new Cwd('./path/to/dir');
-
+const cwd = require('run-in-cwd');
 const childProc = cwd.spawn('git status') 
 
 let isClean = false;
@@ -214,8 +199,8 @@ childProc.on('line/out', (line) => {
 })
 
 childProc.on('close', (exitCode) => {
-    if (exitCode === 0) { // 0 is like 200 OK. 
-        console.log('Clean')
+    if (exitCode === 0 && isClean) { // 0 is like 200 OK. 
+        console.log('Branch is clean')
     }
     else {
         console.log('Stage & Commit')
@@ -278,12 +263,12 @@ childProc.spawn('git', ['add', '-A'], {cwd: '../path-to/my-folder'})
 
 run-in-cwd:
 ```js
-const Cwd = require('run-in-cwd')
-const myFolder = new Cwd('../path-to/my-folder')
+const createCwd = require('run-in-cwd')
+const cwd = createCwd('../path-to/my-folder')
 
-myFolder.spawn('git', 'status')
-myFolder.spawn('git', 'add', '-A')
-myFolder.spawn('git', 'commit')
+cwd.spawn('git', 'status')
+cwd.spawn('git', 'commit')
+cwd.spawn('git', ['add', '-A'])
 ```
 
 &nbsp;
@@ -299,21 +284,14 @@ childProc.spawn('ls -l', {shell: true})
 ```
 With `run-in-cwd` you do it like:
 ```js
-const Cwd = require('run-in-cwd')
-const cwd = new Cwd();
+const cwd = require('run-in-cwd')
 
 // :D
-cwd().spawn('ls -l')
-```
-The whole command string is split by spaces and then transformed into:
-```js
-.spawn('ls', ['-l'])
-```
-
-If you need a shell - use `spawnShell` instead of `spawn`:
-```js
+cwd.spawn('ls -l')
 cwd.spawnShell('ls -l')
 ```
+
+&nbsp;
 
 What is CWD?
 ------------
@@ -326,7 +304,7 @@ C:\path\code\>
 # Linux
 ~/path/code $
 ```
-`run-in-cwd`'s original purpose was trying to make running commands in Node a bit more like that.
+`run-in-cwd` makes running commands in Node a bit more like that.
 
 
 
