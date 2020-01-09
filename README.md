@@ -86,6 +86,7 @@ Don't forget to handle errors with `promise.catch()` or a `try-catch` wrapper.
 **Arguments:**
 * **cmd** *(Required)* - A command string (e.g. `'npm'`)
 * **args** - An array of the command's arguments (e.g. `['-flag', 'key=value']`). Could also be a string or a number for a single argument.
+> NOTE: `cmd` string could also include the arguments e.g. `.runCmd('npm install')`
 * **options** - spawn options object. [See Node's docs](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options).  
 Additional option:
     * `maxCacheSize` - Limit the command cache in MegaBytes. The limit is the total output for both `stdout` & `stderr` streams. Default value is `10`. An exception is thrown when max size is exceeded.  
@@ -115,7 +116,7 @@ const projectDir = new Cwd('./path/to/project');
 
 Use Promise Style:
 ```js
-projectDir.runCmd('git status')
+projectDir.runCmd('npm install')
     .then({isOk, stderr} => {
         // ...
     })
@@ -128,7 +129,7 @@ Use with Async-Await:
 ```js
 (async () => { // `await` only runs inside async functions
     try {
-        const {isOk, stdoutLines} = await projectDir.runCmd('git status')
+        const {isOk, stdoutLines} = await projectDir.runCmd('npm install')
 
         // ...
     }
@@ -168,7 +169,8 @@ childProc.on('error', (err) => { /* handle error */ })
 
 **Arguments:**
 * **cmd** *(Required)* - A command string (e.g. `'npm'`)
-* **args** - An array of the command's arguments (e.g. `['-flag', 'cache=500']`)
+* **args** - An array of the command's arguments (e.g. `['-flag', 'cache=500']`). Could also be a string or a number for a single argument.
+> NOTE: `cmd` string could also include the arguments e.g. `.spawn('npm install')`
 * **options** - spawn options object. [See Node's docs](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options).
 
 **Returns:** \<child_process\>
@@ -178,22 +180,8 @@ Calling `.spawn()` is only the first part of spawning a process. We then need to
 
 First, spawn a child process:
 ```js
-const Cwd = require('run-in-cwd');
-const cwd = new Cwd('./path/to/dir');
-
-// Simple command
-const childProc = cwd.spawn('ls')
-
-// With arguments
-const childProc = cwd.spawn('git', ['status'])
-
-// you can also do:
-const childProc = cwd.spawn('git status')
-
-// and also:
-const childProc = cwd.spawnShell('git add -A && git commit')
+const childProc = cwd.spawn('npm install --save')
 ```
-&nbsp;
 
 &nbsp;
 
