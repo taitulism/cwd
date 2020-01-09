@@ -47,7 +47,7 @@ Run CLI commands with Node.
 
 * [.runCmd](#runcmd-cmd-args-options--)
 * [.spawn](#spawn-cmd-args-options--)
-* [<chil_process>](#child_process)
+* [<child_process>](#child_process)
 * [.runShellCmd](#runShellCmd-cmd-args-options--)
 * [.spawnShell](#spawnshell-cmd-args-options--)
 
@@ -61,8 +61,14 @@ Take care of errors with `promise.catch()` or a `try-catch` wrapper.
 
 **Arguments:**
 * **cmd** *(Required)* - A command string (e.g. `'npm'`)
-* **args** - An array of the command's arguments (e.g. `['-flag', 'cache=500']`)
-* **options** - spawn options object. [See Node's docs](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options).
+* **args** - An array of the command's arguments (e.g. `['-flag', 'key=value']`)
+* **options** - spawn options object. [See Node's docs](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options).  
+Additional option:
+    * `maxCacheSize` - Limit the command cache in MegaBytes. The limit is the total output for both `stdout` & `stderr` streams. Default value is `10`. An exception is thrown when max size is exceeded.  
+        ```js
+        myDir.runCmd('cat logFile.txt', {maxCacheSize: 20}) // 20 MB limit
+        ```
+
 
 **Returns:** A promise for the command results.
 
@@ -71,11 +77,10 @@ The promised result is an object with the following properties:
 * **`isOk`** - Boolean - `true` if command exit code is 0. `false` otherwise.
 * **`stdout`** - String - The commands's `stdout` output string (utf-8 encoded).
 * **`stderr`** - String - The commands's `stderr` output string (utf-8 encoded).
+* **`output`** - String - Both streams' output string (utf-8 encoded).
 * **`stdoutLines`** - Array - The commands's `stdout` output, split to lines.
 * **`stderrLines`** - Array -The commands's `stderr` output, split to lines.
-
->Both `stdout` & `stderr` are buffered and each has a max limit of ~5MB.  
-`runCmd()` will throw an exception when max size is exceeded.
+* **`lines`** - Array - Both streams' output, split to lines.
 
 **Examples:**  
 First, create an instance:
@@ -277,7 +282,7 @@ cwd.spawnShell('ls -l')
 What is CWD?
 ------------
 `CWD` stands for: Current Working Directory.  
-When working with a Command Line Interface (CLI) you excecute commands from within a certain directory, your `code` folder, for example:
+When working with a Command Line Interface (CLI) you execute commands from within a certain directory, your `code` folder, for example:
 ```sh
 # Windows
 C:\path\code\>
