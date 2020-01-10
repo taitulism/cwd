@@ -10,6 +10,7 @@ Run CLI commands with Node.
 * [Default Instance](#default-instance)  
 * [API](#instance-api)
 * [What is CWD](#what-is-cwd)
+* [run-in-cwd vs. Node's child_process](#run-in-cwd-vs.-nodes-child_process)
 
 
 ## Get Started
@@ -246,53 +247,7 @@ When the parent process is Node's global `process` object, it usually means writ
 
 &nbsp;
 
-
---------------------------------
-`run-in-cwd` vs. `child_process`
---------------------------------
-When you need to run multiple commands on the same directory and it's not your *Current Working Directory*, you will find yourself repetitively using spawn's option: `{cwd: 'path-to/my-folder'}`. With `CWD` you only do it once.
-
-Node's child process:
-```js
-const childProc = require('child_process')
-
-childProc.spawn('git', ['status'], {cwd: '../path-to/my-folder'})
-childProc.spawn('git', ['commit'], {cwd: '../path-to/my-folder'})
-childProc.spawn('git', ['add', '-A'], {cwd: '../path-to/my-folder'})
-```
-
-run-in-cwd:
-```js
-const createCwd = require('run-in-cwd')
-const cwd = createCwd('../path-to/my-folder')
-
-cwd.spawn('git', 'status')
-cwd.spawn('git', 'commit')
-cwd.spawn('git', ['add', '-A'])
-```
-
-&nbsp;
-
-When you want to run a simple command with a simple argument like: `ls -l` you would normally either (1) pass a command string AND an array with a single argument or (2) add the `{shell: true}` spawn option.
-
-```js
-const childProc = require('child_process')
-
-// :(
-childProc.spawn('ls', ['-l'])
-childProc.spawn('ls -l', {shell: true})
-```
-With `run-in-cwd` you do it like:
-```js
-const cwd = require('run-in-cwd')
-
-// :D
-cwd.spawn('ls -l')
-cwd.spawnShell('ls -l')
-```
-
-&nbsp;
-
+------------
 What is CWD?
 ------------
 `CWD` stands for: Current Working Directory.  
@@ -307,5 +262,103 @@ C:\path\code\>
 `run-in-cwd` makes running commands in Node a bit more like that.
 
 
+&nbsp;
+
+---------------------------------------
+`run-in-cwd` vs. Node's `child_process`
+---------------------------------------
+
+### Command arguments
+
+With Node, when you want to run a simple command with arguments like: `git status` you would normally either (1) pass a command string AND an arguments array (even for a single argument) or (2) add the `{shell: true}` option (which wasn't meant to be used for such cases).
+
+```js
+const childProc = require('child_process')
+
+childProc.spawn('git', ['status'])
+childProc.spawn('git status', {shell: true})
+```
+
+`run-in-cwd` takes care of the arguments for you
+```js
+const cwd = require('run-in-cwd')
+
+cwd.spawn('git status')
+```
+
+And when you really need a shell:
+```js
+cwd.spawnShell('git status')
+```
+
+&nbsp;
+
+### Setting the working directory
+
+Both ways use `process.cwd()` as the default working directory for running commands.
+
+When you need to run commands on the same directory but it's not your *Current Working Directory*, with Node, you will find yourself repetitively using the "cwd" option: `{cwd: 'path-to/my-folder'}`:
+
+Node's child process:
+```js
+const childProc = require('child_process')
+
+childProc.spawn('git', ['status'], {cwd: '../path-to/my-folder'})
+childProc.spawn('git', ['commit'], {cwd: '../path-to/my-folder'})
+childProc.spawn('git', ['push', 'origin', 'master'], {cwd: '../path-to/my-folder'})
+```
+
+With `run-in-cwd` you only do it once:
+```js
+const createCwd = require('run-in-cwd')
+const cwd = createCwd('../path-to/my-folder')
+
+cwd.spawn('git status')
+cwd.spawn('git commit')
+cwd.spawn('git push origin master')
+```
+
+&nbsp;
+
+### Data Events
+
+To read a command's output we need to listen to the command streams' `'data'` event:
+With node:
+```js
+const childProc = require('child_process')
+
+const cp = childProc.spawn('git', ['status']);
+
+cp.stdout.on('data', (chunk) => {
+    console.log(chunk)
+    // <Buffer 68 65 6c 6c 6f 20 77 6f 72 6c 64>
+})
+```
+
+Data chunks, besides being buffers, as random pieces of data cannot gurantee you get a whole word or a full sentence.
+
+`run-in-cwd` provides some higher-level events that emit text (UTF-8 strings), split into lines.
+
+So the equivalent of the native way:
+```js
+// Native Node
+const childProc = require('child_process')
+const cp = childProc.spawn('git', ['status']);
+
+cp.stdout.on('data', (chunk) => ...)
+cp.stderr.on('data', (chunk) => ...)
+```
+would be:
+```js
+// run-in-cwd
+const cwd = require('run-in-cwd')
+const cp = cwd.spawn('git status');
+
+cp.on('line/out', (line) => ...)
+cp.on('line/err', (line) => ...)
+
+// emits for both
+cp.on('line', (line) => ...)
+```
 
 
