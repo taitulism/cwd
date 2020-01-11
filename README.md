@@ -45,7 +45,7 @@ Run CLI commands with Node.
 &nbsp;
 
 ## Default Instance
-`run-in-cwd` exports a default instance you could use if your target folder is in which the current process runs in. Meaning, what `process.cwd()` returns.
+`run-in-cwd` exports a default instance ready to use if your target folder is in which the current process runs in. Meaning, what `process.cwd()` returns.
 ```js
 const cwd = require('run-in-cwd');
 
@@ -54,7 +54,7 @@ cwd.runCmd('git status').then(...)
 
 It's the same instance you would get if you run `createCwd('./')` or even `createCwd()`
 
-**NOTE:** Do not extract cwd methods when requiring:
+**NOTE:** For context's sake, do not extract cwd methods:
 ```js
 // DO NOT:
 const {runCmd} = require('run-in-cwd')
@@ -74,7 +74,7 @@ const {runCmd} = require('run-in-cwd')
 ------------------------------------------------------------
 ### **.runCmd(** cmd, [args, [options] ] **)**
 ------------------------------------------------------------
-Executes a command and returns a promise that resolves when the command exits.  
+Executes a command and returns a completion promise (command exits).  
 Similar to Node's `child_process.exec` and `child_process.execFile` ([see docs](https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback)). 
 
 Don't forget to handle errors with `promise.catch()` or a `try-catch` wrapper.
@@ -91,9 +91,9 @@ Additional option:
         ```
 
 
-**Returns:** A promise for the command results.
+**Returns:** A promise for a command results object.
 
-The promised result is an object with the following properties:  
+A result object has the following properties:  
 * **`exitCode`** - Number - The command exit code.
 * **`isOk`** - Boolean - `true` if command exit code is 0. `false` otherwise.
 * **`stdout`** - String - The commands's `stdout` output string (utf-8 encoded).
@@ -117,7 +117,7 @@ cwd.runCmd('npm install')
 
 Async-Await style:
 ```js
-(async () => { // `await` only runs inside async functions
+(async () => {
     try {
         const {isOk, stdoutLines} = await projectDir.runCmd('npm install')
 
@@ -131,12 +131,12 @@ Async-Await style:
 
 
 ### The difference between `!isOk`, `stderr` and `error`:
-A CLI command creates a process that has two output channels it can use to communicate with its parent process: one for the command's standard output (`stdout`), and one for its errors (`stderr`).
-Every command also finishes with an exit code. The consensus is exit code `0` for success (a kind of an HTTP "200 OK" status code) and non-zero otherwise. Commands can utilize those channels and exit codes differently, even "incorrectly" as there is no standard other than subjective common sense...
+A CLI command creates a process that has two output channels it utilize to communicate with its parent process: one for the command's standard output (`stdout`), and one for its errors (`stderr`).
+Every command also finishes with an exit code. The consensus is exit code `0` for success (a kind of an HTTP "200 OK" status code) and non-zero otherwise. Different commands use those channels and exit codes differently, even "incorrectly" as there is no standard other than subjective common sense...
 
-So when a command fails it will probably send some details through its `stderr` channel and exit with a non-zero exit code but it **will** be completed. No errors will be thrown in the Node process that executed the command.
+So when a command fails it will probably send some details through its `stderr` channel and exit with a non-zero exit code but it will be completed. No errors will be thrown in the Node process that executed the command.
 
-An `exception` is thrown when there was a problem with the command **execution** in our environment. For example when the command itself is not found (e.g. a typo like `ggit`) or for example when a command tries to write stuff but you have no free storage, etc.
+An `exception` is thrown when there was a problem with the command execution in our environment. For example when the command itself is not found (e.g. a typo like `ggit`).
 
 &nbsp;
 
@@ -148,7 +148,7 @@ An `exception` is thrown when there was a problem with the command **execution**
 ------------------------------------------------------------
 ### **.spawn(** cmd, [args, [options] ] **)**
 ------------------------------------------------------------
-Runs a command and returns a child process with some extra events.
+Runs a command and returns a child process.
 
 > It is highly recommended to handle errors:
 ```js
@@ -175,10 +175,10 @@ const childProc = cwd.spawn('npm install --save')
 
 **\<child_process\>**
 ---------------------
-`.spawn`'s return object is [Node's native ChildProcess](https://nodejs.org/api/child_process.html#child_process_class_childprocess) with some extra events.
+`.spawn`'s return object is [Node's native ChildProcess](https://nodejs.org/api/child_process.html#child_process_class_childprocess) with additional events.
 
 * ### Event: `'line'`
-    Is triggered for each line of both `stdout` and `stderr` streams. Buffers data chunks and emits a `line` event for every newline character (`\n`). Ignores empty lines.
+    Is triggered for each line of both `stdout` and `stderr` streams. Text is split to lines by newline characters.
 
 * ### Event: `'line/out'`
     Same as `line` event, but for `stdout` only.
@@ -259,7 +259,8 @@ C:\path\code\>
 # Linux
 ~/path/code $
 ```
-`run-in-cwd` makes running commands in Node a bit more like that.
+
+This basic concept of running commands from within a certain folder was the main trigger to create `run-in-cwd`.
 
 
 &nbsp;
@@ -270,7 +271,7 @@ C:\path\code\>
 
 ### Command arguments
 
-With Node, when you want to run a simple command with arguments like: `git status` you would normally either (1) pass a command string AND an arguments array (even for a single argument) or (2) add the `{shell: true}` option (which wasn't meant to be used for such cases).
+With Node, when you want to run a simple command with arguments like: `git status` you would normally either (1) pass a command string and an arguments array (even for a single argument) or (2) add the `{shell: true}` option.
 
 ```js
 const childProc = require('child_process')
@@ -297,7 +298,7 @@ cwd.spawnShell('git status')
 
 Both ways use `process.cwd()` as the default working directory for running commands.
 
-When you need to run commands on the same directory but it's not your *Current Working Directory*, with Node, you will find yourself repetitively using the "cwd" option: `{cwd: 'path-to/my-folder'}`:
+When you need to run commands on the same directory but it's not your *Current Working Directory*, with Node, you will find yourself repetitively using the "cwd" option.
 
 Node's child process:
 ```js
@@ -322,13 +323,10 @@ cwd.spawn('git push origin master')
 
 ### Data Events
 
-To read a command's output we need to listen to the command streams' `'data'` event:
-With node:
+To read a command's output we need to listen to the command streams `'data'` events.
+
+Data events emit chunks:
 ```js
-const childProc = require('child_process')
-
-const cp = childProc.spawn('git', ['status']);
-
 cp.stdout.on('data', (chunk) => {
     console.log(chunk)
     // <Buffer 68 65 6c 6c 6f 20 77 6f 72 6c 64>
