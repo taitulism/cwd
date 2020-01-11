@@ -34,7 +34,8 @@ module.exports = () => {
 		});
 
 		it('handles shell characters', async () => {
-			const {stdoutLines} = await cwd.runShellCmd('echo A && echo B && echo C');
+			// echo with no spaces for windows cmd :/
+			const {stdoutLines} = await cwd.runShellCmd('echo A&& echo B&& echo C');
 			const expectedArray = ['A', 'B', 'C'];
 
 			expect(stdoutLines).to.eql(expectedArray);

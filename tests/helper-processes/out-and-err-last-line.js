@@ -20,15 +20,22 @@ const str2 = `${EOL}ccc${EOL}${EOL}${EOL}ddd`;
 
 if (channel === 'stdout') {
 	process.stdout.write(str1);
-	process.stdout.write(str2);
+	setTimeout(() => {
+		process.stdout.write(str2);
+	}, 100);
 }
 else if (channel === 'stderr') {
 	process.stderr.write(str1);
-	process.stderr.write(str2);
+	setTimeout(() => {
+		process.stderr.write(str2);
+	}, 100);
 }
 else if (!channel) { // both
 	process.stdout.write(str1);
-	process.stderr.write(str2);
+	setTimeout(() => {
+		process.stderr.write(str2);
+	}, 100);
+
 }
 else {
 	let errorMsg = `out-and-err-last-line.js script invalid argument "${channel}".`;

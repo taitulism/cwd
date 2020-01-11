@@ -1,6 +1,5 @@
 /* eslint-disable no-shadow, max-lines */
 
-const {EOL} = require('os');
 const {expect} = require('chai');
 
 const {TEST_DIR, OTHER_TEST_DIR} = require('../constants');
@@ -69,50 +68,6 @@ module.exports = () => {
 				});
 			});
 
-			it('discards empty lines', (done) => {
-				const file = '../helper-processes/out-and-err-empty-lines.js';
-				const childProc = cwd.spawn(`node ${file}`);
-
-				const lines = [];
-				childProc.on('line', (line) => {
-					lines.push(line);
-				});
-
-				// use both native streams for reference
-				let stdBuffer = '';
-				// stdout
-				childProc.stdout.on('data', (chunk) => {
-					stdBuffer += chunk;
-				});
-				// stderr
-				childProc.stderr.on('data', (chunk) => {
-					stdBuffer += chunk;
-				});
-
-				childProc.on('close', () => {
-					const splitBuffer = stdBuffer.split(EOL);
-
-					expect(splitBuffer).to.have.lengthOf(9);
-
-					let emptyLines = 0;
-					splitBuffer.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(5);
-					expect(lines).to.have.lengthOf(4);
-
-					emptyLines = 0;
-					lines.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(0);
-
-					done();
-				});
-			});
-
 			it('emits last line', (done) => {
 				const file = '../helper-processes/out-and-err-last-line.js';
 				const childProc = cwd.spawn(`node ${file}`);
@@ -122,35 +77,9 @@ module.exports = () => {
 					lines.push(line);
 				});
 
-				let stdBuffer = '';
-				childProc.stdout.on('data', (chunk) => {
-					stdBuffer += chunk;
-				});
-				childProc.stderr.on('data', (chunk) => {
-					stdBuffer += chunk;
-				});
-
 				childProc.on('close', () => {
-					// test the native stderr string for reference
-					const splitBuffer = stdBuffer.split(EOL);
-
-					expect(splitBuffer).to.have.lengthOf(7);
-
-					let emptyLines = 0;
-					splitBuffer.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(3);
-					expect(lines).to.have.lengthOf(4);
-
-					emptyLines = 0;
-					lines.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(0);
-
+					expect(lines).to.have.lengthOf(7);
+					expect(lines[6]).to.equal('ddd');
 					done();
 				});
 			});
@@ -196,45 +125,6 @@ module.exports = () => {
 				});
 			});
 
-			it('discards empty lines', (done) => {
-				const file = '../helper-processes/out-and-err-empty-lines.js';
-				const childProc = cwd.spawn(`node ${file} stdout`);
-
-				const lines = [];
-				childProc.on('line/out', (line) => {
-					lines.push(line);
-				});
-
-				let stdoutBuffer = '';
-				childProc.stdout.on('data', (chunk) => {
-					stdoutBuffer += chunk;
-				});
-
-				childProc.on('close', () => {
-					// test the native stdout string for reference
-					const splitBuffer = stdoutBuffer.split(EOL);
-
-					expect(splitBuffer).to.have.lengthOf(9);
-
-					let emptyLines = 0;
-					splitBuffer.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(5);
-					expect(lines).to.have.lengthOf(4);
-
-					emptyLines = 0;
-					lines.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(0);
-
-					done();
-				});
-			});
-
 			it('emits last line', (done) => {
 				const file = '../helper-processes/out-and-err-last-line.js';
 				const childProc = cwd.spawn(`node ${file} stdout`);
@@ -244,32 +134,9 @@ module.exports = () => {
 					lines.push(line);
 				});
 
-				let stdoutBuffer = '';
-				childProc.stdout.on('data', (chunk) => {
-					stdoutBuffer += chunk;
-				});
-
 				childProc.on('close', () => {
-					// test the native stderr string for reference
-					const splitBuffer = stdoutBuffer.split(EOL);
-
-					expect(splitBuffer).to.have.lengthOf(7);
-
-					let emptyLines = 0;
-					splitBuffer.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(3);
-					expect(lines).to.have.lengthOf(4);
-
-					emptyLines = 0;
-					lines.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(0);
-
+					expect(lines).to.have.lengthOf(7);
+					expect(lines[6]).to.equal('ddd');
 					done();
 				});
 			});
@@ -315,45 +182,6 @@ module.exports = () => {
 				});
 			});
 
-			it('discards empty lines', (done) => {
-				const file = '../helper-processes/out-and-err-empty-lines.js';
-				const childProc = cwd.spawn(`node ${file} stderr`);
-
-				const lines = [];
-				childProc.on('line/err', (line) => {
-					lines.push(line);
-				});
-
-				let stderrBuffer = '';
-				childProc.stderr.on('data', (chunk) => {
-					stderrBuffer += chunk;
-				});
-
-				childProc.on('close', () => {
-					// test the native stderr string for reference
-					const splitBuffer = stderrBuffer.split(EOL);
-
-					expect(splitBuffer).to.have.lengthOf(9);
-
-					let emptyLines = 0;
-					splitBuffer.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(5);
-					expect(lines).to.have.lengthOf(4);
-
-					emptyLines = 0;
-					lines.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(0);
-
-					done();
-				});
-			});
-
 			it('emits last line', (done) => {
 				const file = '../helper-processes/out-and-err-last-line.js';
 				const childProc = cwd.spawn(`node ${file} stderr`);
@@ -363,32 +191,9 @@ module.exports = () => {
 					lines.push(line);
 				});
 
-				let stderrBuffer = '';
-				childProc.stderr.on('data', (chunk) => {
-					stderrBuffer += chunk;
-				});
-
 				childProc.on('close', () => {
-					// test the native stderr string for reference
-					const splitBuffer = stderrBuffer.split(EOL);
-
-					expect(splitBuffer).to.have.lengthOf(7);
-
-					let emptyLines = 0;
-					splitBuffer.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(3);
-					expect(lines).to.have.lengthOf(4);
-
-					emptyLines = 0;
-					lines.forEach((line) => {
-						!line && emptyLines++;
-					});
-
-					expect(emptyLines).to.equal(0);
-
+					expect(lines).to.have.lengthOf(7);
+					expect(lines[6]).to.equal('ddd');
 					done();
 				});
 			});

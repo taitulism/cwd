@@ -53,8 +53,6 @@ function registerLineEvent (cp, channel) {
 		cp[channel].lineBuffer = lines.pop(); // last line
 
 		lines.forEach((line) => {
-			if (!line) return;
-
 			cp.emit(channelLineEventName, line);
 			cp.emit(LINE_EVENT, line);
 		});

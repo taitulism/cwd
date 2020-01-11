@@ -31,7 +31,8 @@ module.exports = () => {
 		});
 
 		it('handles shell characters', (done) => {
-			const childProc = cwd.spawnShell('echo A && echo B && echo C');
+			// echo with no spaces for windows cmd :/
+			const childProc = cwd.spawnShell('echo A&& echo B&& echo C');
 			const lineOutArray = [];
 			const expectedArray = ['A', 'B', 'C'];
 
