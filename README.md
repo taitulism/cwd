@@ -68,7 +68,7 @@ const {runCmd} = require('run-in-cwd')
 * [<child_process>](#child_process)
 * [.runShellCmd](#runShellCmd-cmd-args-options--)
 * [.spawnShell](#spawnshell-cmd-args-options--)
-* [.parentProcess](#parent-process)
+* [.parentProcess](#parentprocess)
 
 
 ------------------------------------------------------------
