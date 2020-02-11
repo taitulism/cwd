@@ -9,32 +9,21 @@ const DIR = __dirname;
 const cwd = Cwd(DIR);
 
 
-async function getFiles () {
-	const [isOk, stdout, stderr] = await cwd.runCmd(`node ../tests/helper-processes/max-buffer-err.js`, [1024*1024*5]);
-
-	if (isOk)
-		return stdout.split('\n');
-	else
-		return stderr;
-}
-
 (async () => {
 	try {
-		// const cp = cwd.spawn('  ls ', ['../'], {stdio: 'pipe'})
-		// const cp = cwd.runCmd('  ls ', ['./'], {stdio: 'inherit'})
-		const cp = cwd.parentProcess.runCmd('echo hi')
+		const cp = cwd.spawn('echo AAA\nBBB');
 
-		cp.then((p) => {
-			console.log('p', p);
+		// .then((p) => {
+		// 	console.log('p', p);
+		// })
+
+		cp.on('line', (line) => {
+			console.log('line', line);
 		})
 
-		// cp.on('line', (line) => {
-		// 	console.log('line', line);
-		// })
-
-		// cp.on('close', (code) => {
-		// 	console.log('code', code);
-		// })
+		cp.on('close', (code) => {
+			console.log('code', code);
+		})
 
 
 
