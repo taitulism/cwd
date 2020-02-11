@@ -17,9 +17,11 @@
 	"main": "./index.js",
 	"scripts": {
 		"dev": "mocha ./tests --bail --watch",
+		"check": "npm run lint && npm test",
 		"test": "mocha ./tests",
-		"lint": "eslint ./src ./tests",
-		"preversion": "npm run lint && npm test",
+		"lint": "eslint ./index.js ./src ./tests",
+		"play": "node ./playground/play.js",
+		"preversion": "npm run check",
 		"postversion": "git push && git push --tags"
 	},
 	"repository": {
